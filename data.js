@@ -1,37 +1,191 @@
 const sentencesData = {
-    shopping: [
-        { german: "Wo ist die Milch?", arabic: "أين الحليب؟", usage: "عند البحث عن منتج" },
-        { german: "Wie viel kostet das?", arabic: "كم سعر هذا؟", usage: "عند السؤال عن السعر" },
-        { german: "Ich brauche eine Tüte.", arabic: "أحتاج كيسًا", usage: "عند طلب كيس" },
-        { german: "Kann ich mit Karte zahlen?", arabic: "هل أستطيع الدفع بالبطاقة؟", usage: "عند الدفع" },
-        { german: "Ich nehme das.", arabic: "سآخذ هذا", usage: "عند الشراء" }
-    ],
-    transport: [
-        { german: "Wo ist der Bahnhof?", arabic: "أين المحطة؟", usage: "عند البحث" },
-        { german: "Wie komme ich zum Bahnhof?", arabic: "كيف أصل إلى المحطة؟", usage: "طلب المساعدة" }
-    ],
-    restaurant: [
-        { german: "Haben Sie einen Tisch frei?", arabic: "هل لديكم طاولة فارغة؟", usage: "عند الدخول" },
-        { german: "Die Speisekarte, bitte.", arabic: "قائمة الطعام من فضلك", usage: "طلب القائمة" }
-    ],
-    daily: [
-        { german: "Guten Morgen!", arabic: "صباح الخير!", usage: "تحية" },
-        { german: "Wie geht's?", arabic: "كيف حالك؟", usage: "تحية" }
-    ],
-    doctor: [
-        { german: "Mir geht's nicht gut.", arabic: "لا أشعر بحال جيدة", usage: "عند المرض" }
-    ],
-    work: [
-        { german: "Haben Sie einen Moment Zeit?", arabic: "هل لديك دقيقة من الوقت؟", usage: "طلب الانتباه" }
-    ],
-    home: [
-        { german: "Ich bin endlich zu Hause.", arabic: "أنا في البيت أخيراً", usage: "عند الوصول" }
-    ],
-    phone: [
-        { german: "Hallo, wer spricht da?", arabic: "ألو، من يتحدث؟", usage: "فتح المكالمة" }
-    ],
-    emergency: [
-        { german: "HILFE! Notfall!", arabic: "نَجدَة! حالة طارئَة!", usage: "نداء استغاثة" }
-    ]
-};
+            shopping: [
+                { german: "Wo ist die Milch?", arabic: "أين الحليب؟", usage: "عند البحث عن منتج" },
+                { german: "Wie viel kostet das?", arabic: "كم سعر هذا؟", usage: "عند السؤال عن السعر" },
+                { german: "Ich brauche eine Tüte.", arabic: "أحتاج كيسًا", usage: "عند طلب كيس" },
+                { german: "Kann ich mit Karte zahlen?", arabic: "هل أستطيع الدفع بالبطاقة؟", usage: "عند الدفع" },
+                { german: "Haben Sie das?", arabic: "هل لديكم هذا؟", usage: "عند البحث" },
+                { german: "Das ist zu teuer.", arabic: "هذا غالٍ جداً", usage: "عند رفض السعر" },
+                { german: "Ich nehme das.", arabic: "سآخذ هذا", usage: "عند الشراء" },
+                { german: "Wo ist die Kasse?", arabic: "أين الصندوق؟", usage: "عند الدفع" },
+                { german: "Das ist alles.", arabic: "هذا كل شيء", usage: "بعد الانتهاء" },
+                { german: "Noch etwas?", arabic: "شيء آخر؟", usage: "سؤال البائع" },
+                { german: "Nein, danke.", arabic: "لا، شكراً", usage: "الرد بالرفض" },
+                { german: "Ja, gerne.", arabic: "نعم، بكل سرور", usage: "الرد بالقبول" },
+                { german: "Was kostet ein Kilo?", arabic: "كم سعر الكيلو؟", usage: "عند السؤال عن السعر" },
+                { german: "Haben Sie Äpfel?", arabic: "هل لديكم تفاح؟", usage: "عند البحث" },
+                { german: "Wo finde ich Brot?", arabic: "أين أجد الخبز؟", usage: "عند البحث" },
+                { german: "Ist das frisch?", arabic: "هل هذا طازج؟", usage: "عند السؤال" },
+                { german: "Das nehme ich nicht.", arabic: "لن آخذ هذا", usage: "عند الرفض" },
+                { german: "Haben Sie eine Tüte?", arabic: "هل لديكم كيس؟", usage: "عند طلب كيس" },
+                { german: "Wo ist das Gemüse?", arabic: "أين الخضار؟", usage: "عند البحث" },
+                { german: "Ich möchte das.", arabic: "أريد هذا", usage: "عند الطلب" },
+                { german: "Gibt es einen Rabatt?", arabic: "هل يوجد تخفيض؟", usage: "عند السؤال عن التخفيض" },
+                { german: "Das ist zu klein.", arabic: "هذا صغير جداً", usage: "عند رفض المقاس" },
+                { german: "Haben Sie das größer?", arabic: "هل لديكم أكبر؟", usage: "عند طلب مقاس أكبر" },
+                { german: "Ich suche ein Geschenk.", arabic: "أبحث عن هدية", usage: "عند التسوق" },
+                { german: "Wo ist der Ausgang?", arabic: "أين المخرج؟", usage: "عند المغادرة" },
+                { german: "Kann ich das umtauschen?", arabic: "هل يمكنني استبدال هذا؟", usage: "عند الاستبدال" },
+                { german: "Haben Sie eine andere Farbe?", arabic: "هل لديكم لون آخر؟", usage: "عند السؤال عن الألوان" },
+                { german: "Wo ist die Umkleidekabine?", arabic: "أين غرفة القياس؟", usage: "في المحل" },
+                { german: "Das passt mir nicht.", arabic: "هذا لا يناسبني", usage: "عند القياس" },
+                { german: "Ich schaue nur.", arabic: "أنا أتفرج فقط", usage: "عند التصفح" },
+                { german: "Wo kann ich parken?", arabic: "أين يمكنني الركن؟", usage: "عند الوصول" },
+                { german: "Bis wann sind Sie offen?", arabic: "حتى متى أنتم مفتوحون؟", usage: "عند السؤال عن الدوام" },
+                { german: "Kann ich eine Quittung haben?", arabic: "هل يمكنني الحصول على فاتورة؟", usage: "بعد الدفع" },
+                { german: "Das ist das Falsche.", arabic: "هذا خطأ", usage: "عند الخطأ" },
+                { german: "Ich habe das bestellt.", arabic: "طلبت هذا", usage: "عند الاستلام" },
+                { german: "Können Sie mir helfen?", arabic: "هل يمكنكم مساعدتي؟", usage: "طلب المساعدة العامة" },
+                { german: "Ich möchte dies zurückgeben.", arabic: "أريد إرجاع هذا.", usage: "عند الإرجاع" },
+                { german: "Dieser Artikel ist beschädigt.", arabic: "هذا المنتج تالف.", usage: "للتذمر عن منتج" },
+                { german: "Haben Sie eine Kundenkarte?", arabic: "هل لديكم بطاقة ولاء؟", usage: "للحصول على خصومات" },
+                { german: "Wo sind die Sonderangebote?", arabic: "أين العروض الخاصة؟", usage: "للبحث عن خصومات" }
+            ],
+            transport: [
+                // الأساسيات (البحث + المواصلات)
+                { german: "Wo ist der Bahnhof?", arabic: "أين المحطة؟", usage: "عند البحث" },
+                { german: "Wo ist die U-Bahn?", arabic: "أين المترو؟", usage: "عند البحث" },
+                { german: "Wo ist der Busbahnhof?", arabic: "أين محطة الباصات؟", usage: "عند البحث" },
+                { german: "Wo ist der Flughafen?", arabic: "أين المطار؟", usage: "عند البحث" },
+                { german: "Wo ist der Ticketautomat?", arabic: "أين آلة التذاكر؟", usage: "في المحطة" },
+
+                // شراء التذاكر + القواعد
+                { german: "Eine Fahrkarte nach Berlin, bitte.", arabic: "تذكرة إلى برلين من فضلك", usage: "عند الشراء" },
+                { german: "Wie viel kostet die Fahrt?", arabic: "كم تكلفة الرحلة؟", usage: "عند الشراء" },
+                { german: "Gibt es eine Tageskarte?", arabic: "هل يوجد تذكرة يومية؟", usage: "للتوفير المالي" },
+                { german: "Muss ich die Fahrkarte entwerten?", arabic: "هل يجب ختم التذكرة؟", usage: "تجنب الغرامات" },
+
+                // الاتجاهات + المساعدة
+                { german: "Wie komme ich zum Bahnhof?", arabic: "كيف أصل إلى المحطة؟", usage: "طلب المساعدة" },
+                { german: "Ist das weit von hier?", arabic: "هل هذا بعيد؟", usage: "تقييم المسافة" },
+                { german: "Geradeaus, dann links/rechts.", arabic: "مباشرة، ثم يسار/يمين", usage: "الاتجاهات الأساسية" },
+
+                // أثناء الرحلة
+                { german: "Wann fährt der Zug?", arabic: "متى يغادر القطار؟", usage: "عند الانتظار" },
+                { german: "Hat der Zug Verspätung?", arabic: "هل القطار متأخر؟", usage: "في المحطة" },
+                { german: "Wo muss ich aussteigen?", arabic: "أين أنزل؟", usage: "في الباص/القطار" },
+                { german: "Muss ich hier umsteigen?", arabic: "هل أغير هنا؟", usage: "في المواصلات" },
+
+                // طوارئ + خدمات
+                { german: "Ich habe mich verlaufen.", arabic: "لقد ضللت الطريق", usage: "طلب المساعدة" },
+                { german: "Wo ist das Fundbüro?", arabic: "أين مكتب المفقودات؟", usage: "للأشياء المفقودة" },
+                { german: "Gibt es einen Aufzug?", arabic: "هل يوجد مصعد؟", usage: "للأمهات وذوي الاحتياجات" },
+
+                // إضافات عملية
+                { german: "Fährt dieser Bus zum Flughafen?", arabic: "هل يذهب هذا الباص للمطار؟", usage: "في الباص" },
+                { german: "Wo kann ich ein Taxi finden?", arabic: "أين أجد تاكسي؟", usage: "في المساء/الطوارئ" },
+                { german: "Darf ich Fahrrad mitnehmen?", arabic: "هل يُسمح بحمل الدراجة؟", usage: "للمسافرين بالدراجات" }
+            ],
+            restaurant: [
+                { german: "Haben Sie einen Tisch frei?", arabic: "هل لديكم طاولة فارغة؟", usage: "عند الدخول" },
+                { german: "Ich habe eine Reservierung.", arabic: "لدي حجز", usage: "عند الوصول" },
+                { german: "Die Speisekarte, bitte.", arabic: "قائمة الطعام من فضلك", usage: "طلب القائمة" },
+                { german: "Was können Sie empfehlen?", arabic: "ماذا توصون؟", usage: "طلب اقتراح" },
+                { german: "Ich bin Vegetarier/Veganer.", arabic: "أنا نباتي/نباتي كامل", usage: "تحديد النظام الغذائي" },
+                { german: "Ich bin allergisch gegen Nüsse.", arabic: "لدي حساسية من المكسرات", usage: "تجنب الخطر" },
+                { german: "Ohne Zwiebeln, bitte.", arabic: "بدون بصل من فضلك", usage: "تعديل الطلب" },
+                { german: "Ein Wasser ohne Gas, bitte.", arabic: "ماء بدون غاز من فضلك", usage: "طلب شراب" },
+                { german: "Die Rechnung, bitte.", arabic: "الحساب من فضلك", usage: "طلب الدفع" },
+                { german: "Für hier oder zum Mitnehmen?", arabic: "هنا أو للأخذ؟", usage: "تحديد نوع الطلب" },
+                { german: "Wo ist die Toilette?", arabic: "أين الحمام؟", usage: "طوارئ" }
+            ],
+            daily: [
+                { german: "Guten Morgen/Tag/Abend!", arabic: "صباح/يوم/مساء الخير!", usage: "تحية حسب الوقت" },
+                { german: "Wie geht's?", arabic: "كيف حالك؟", usage: "تحية غير رسمية" },
+                { german: "Danke / Vielen Dank!", arabic: "شكرًا / شكرًا جزيلًا!", usage: "الشكر" },
+                { german: "Bitte / Kein Problem!", arabic: "تفضل / لا مشكلة!", usage: "رد على الشكر" },
+                { german: "Entschuldigung!", arabic: "عذرًا!", usage: "طلب الانتباه/الاعتذار" },
+                { german: "Sprechen Sie Englisch?", arabic: "هل تتحدث الإنجليزية؟", usage: "الإنقاذ في المواقف الصعبة" },
+                { german: "Wo ist...?", arabic: "أين...؟", usage: "البحث عن أماكن" },
+                { german: "Wie viel kostet das?", arabic: "كم سعر هذا؟", usage: "التسوق" }, // موجودة في قائمة التسوق لكنها أساسية
+                { german: "Ich verstehe nicht.", arabic: "لا أفهم", usage: "طلب التوضيح" },
+                { german: "Können Sie langsamer sprechen?", arabic: "هل يمكنك التحدث ببطء؟", usage: "تحسين التواصل" },
+                { german: "Auf Wiedersehen! / Tschüss!", arabic: "مع السلامة! / وداعًا!", usage: "وداع" }
+            ],
+            doctor: [
+                { german: "Mir geht's nicht gut.", arabic: "لا أشعر بحال جيدة", usage: "وصف الحالة" },
+                { german: "Ich habe starke Schmerzen.", arabic: "لدي آلام شديدة", usage: "عند الألم" },
+                { german: "Mir tut der Kopf/Rücken/Bauch weh.", arabic: "رأسي/ظهري/بطني يؤلمني", usage: "تحديد مكان الألم" },
+                { german: "Ich habe hohes Fieber.", arabic: "لدي حمى عالية", usage: "عند المرض" },
+                { german: "Ich habe starken Husten.", arabic: "لدي سعال شديد", usage: "أعراض تنفسية" },
+                { german: "Mir ist sehr schlecht/schwindlig.", arabic: "أشعر بغثيان/دوار شديد", usage: "أعراض خطيرة" },
+                { german: "Ich habe Probleme beim Atmen.", arabic: "لدي مشاكل في التنفس", usage: "طوارئ" },
+                { german: "Ich bin allergisch gegen Penicillin/Nüsse.", arabic: "لدي حساسية من البنسلين/المكسرات", usage: "تجنب الخطر" },
+                { german: "Ich bin allergisch gegen Penicillin/Nüsse.", arabic: "لدي حساسية من البنسلين/المكسرات", usage: "تجنب الخطر" },
+                { german: "Wo ist die nächste Apotheke?", arabic: "أين أقرب صيدلية؟", usage: "طلب المساعدة" },
+                { german: "Ich habe einen Termin um 10.", arabic: "لدي موعد الساعة 10", usage: "تأكيد الموعد" },
+                { german: "Ich habe meine Versicherungskarte vergessen.", arabic: "نسيت بطاقة التأمين", usage: "إبلاغ عن مشكلة" },
+                { german: "Können Sie mir etwas verschreiben?", arabic: "هل يمكنك وصف دواء؟", usage: "طلب العلاج" },
+                { german: "Muss ich ins Krankenhaus?", arabic: "هل يجب أن أذهب للمستشفى؟", usage: "تقييم الخطورة" },
+                { german: "Ich bin seit gestern krank.", arabic: "أنا مريض منذ البارحة", usage: "وصف المدة" },
+                { german: "Ich brauche ein Rezept.", arabic: "أحتاج وصفة طبية", usage: "طلب الدواء" }
+            ],
+            work: [
+                { german: "Haben Sie einen Moment Zeit?", arabic: "هل لديك دقيقة من الوقت؟", usage: "طلب الانتباه" },
+                { german: "Ich brauche dringend Hilfe.", arabic: "أحتاج مساعدة عاجلة", usage: "طلب الدعم" },
+                { german: "Wann ist die Mittagspause?", arabic: "متى استراحة الغداء؟", usage: "جدولة الوقت" },
+                { german: "Wann beginnt die Arbeit heute?", arabic: "متى يبدأ العمل اليوم؟", usage: "تنظيم اليوم" },
+                { german: "Ich bin gerade sehr beschäftigt.", arabic: "أنا مشغول جدًا الآن", usage: "شرح الانشغال" },
+                { german: "Das ist schon erledigt.", arabic: "تم إنجاز هذا", usage: "إبلاغ الإنجاز" },
+                { german: "Ich muss jetzt gehen.", arabic: "يجب أن أذهب الآن", usage: "مغادرة مهنية" },
+                { german: "Wann ist der Abgabetermin?", arabic: "متى موعد التسليم؟", usage: "إدارة المشاريع" },
+                { german: "Ich brauche noch mehr Zeit.", arabic: "أحتاج مزيدًا من الوقت", usage: "طلب التمديد" },
+                { german: "Können Sie mir dabei helfen?", arabic: "هل يمكنك مساعدتي في هذا؟", usage: "طلب التعاون" },
+                { german: "Ich schicke Ihnen eine E-Mail.", arabic: "سأرسل لك بريدًا إلكترونيًا", usage: "التواصل الرسمي" },
+                { german: "Ist alles in Ordnung?", arabic: "هل كل شيء بخير؟", usage: "الاطمئنان على الفريق" }
+            ],
+            home: [
+                { german: "Ich bin endlich zu Hause.", arabic: "أنا في البيت أخيراً", usage: "عند الوصول" },
+                { german: "Die Tür ist zu.", arabic: "الباب مغلق", usage: "التحقق من السلامة" },
+                { german: "Mach bitte die Tür zu!", arabic: "أغلق الباب من فضلك!", usage: "طلب إغلاق الباب" },
+                { german: "Das Fenster ist offen.", arabic: "النافذة مفتوحة", usage: "تنبيه السلامة" },
+                { german: "Die Heizung funktioniert nicht.", arabic: "التدفئة لا تعمل", usage: "إبلاغ عن عطل" },
+                { german: "Was gibt es heute zu essen?", arabic: "ما الذي سنأكله اليوم؟", usage: "تسيير المنزل" },
+                { german: "Das Essen ist gleich fertig.", arabic: "الطعام سيكون جاهزاً حالاً", usage: "إعلام العائلة" },
+                // ⭐ العبارة المضافة هنا (تسلسل منطقي بعد تحضير الطعام)
+                { german: "Kannst du bitte den Tisch decken?", arabic: "هل يمكنك إعداد الطاولة من فضلك؟", usage: "طلب المساعدة" },
+                { german: "Hast du schon gegessen?", arabic: "هل أكلت بالفعل؟", usage: "الاهتمام بالعائلة" },
+                { german: "Ich habe großen Hunger.", arabic: "أنا جائع جداً", usage: "التعبير عن الحاجة" },
+                { german: "Kannst du mir helfen?", arabic: "هل يمكنك مساعدتي؟", usage: "طلب الدعم" },
+                { german: "Vergiss nicht, Milch zu kaufen!", arabic: "لا تنسَ شراء الحليب!", usage: "تذكير يومي" },
+                { german: "Wann kommst du nach Hause?", arabic: "متى ستأتي إلى البيت؟", usage: "التواصل العائلي" },
+                { german: "Ich bin in zehn Minuten da.", arabic: "سأكون هناك خلال 10 دقائق", usage: "الرد على السؤال" },
+                { german: "Ich bin sehr müde.", arabic: "أنا متعب جداً", usage: "التعبير عن الحالة" },
+                { german: "Ich gehe jetzt schlafen.", arabic: "سأذهب للنوم الآن", usage: "إعلام قبل النوم" }
+            ],
+            phone: [
+                { german: "Hallo, wer spricht da?", arabic: "ألو، من يتحدث؟", usage: "فتح المكالمة" },
+                { german: "Einen Moment, bitte.", arabic: "لحظة من فضلك", usage: "طلب الانتظار" },
+                { german: "Er ist nicht da.", arabic: "هو ليس موجوداً", usage: "إبلاغ عن الغياب" },
+                { german: "Kann ich eine Nachricht hinterlassen?", arabic: "هل يمكنني ترك رسالة؟", usage: "طلب ترك رسالة" },
+                { german: "Ich rufe später wieder zurück.", arabic: "سأتصل مجدداً لاحقاً", usage: "إنهاء المكالمة" },
+                { german: "Die Leitung ist besetzt.", arabic: "الخط مشغول", usage: "إبلاغ عن المشكلة" },
+                { german: "Ich verstehe Sie nicht gut.", arabic: "لا أفهمك جيداً", usage: "طلب التوضيح" },
+                { german: "Können Sie das wiederholen?", arabic: "هل يمكنك التكرار؟", usage: "طلب التكرار" },
+                { german: "Können Sie lauter sprechen?", arabic: "هل يمكنك رفع الصوت؟", usage: "تحسين الصوت" },
+                { german: "Die Verbindung ist schlecht.", arabic: "الاتصال سيء", usage: "إبلاغ عن مشكلة" },
+                { german: "Können Sie mich zurückrufen?", arabic: "هل يمكنك الاتصال بي لاحقاً؟", usage: "طلب إعادة الاتصال" },
+                { german: "Wann kann ich Sie erreichen?", arabic: "متى يمكنني الاتصال بك؟", usage: "ترتيب الموعد" },
+                { german: "Wie ist Ihre Nummer?", arabic: "ما هو رقم هاتفك؟", usage: "طلب الرقم" },
+                { german: "Ich gebe Ihnen meine Nummer.", arabic: "سأعطيك رقمي", usage: "إعطاء الرقم" },
+                { german: "Es tut mir leid, ich muss auflegen.", arabic: "آسف، يجب أن أغلق", usage: "إنهاء عاجل" }
+            ],
+            emergency: [
+                { german: "HILFE! Notfall!", arabic: "نَجدَة! حالة طارئَة!", usage: "نداء استغاثة أولي" },
+                { german: "Rufen Sie 112 an!", arabic: "اتصلوا برقم 112!", usage: "رقم الطوارئ الأوروبي" },
+                { german: "Feuer! Sofort löschen!", arabic: "حريق! أطفئوه فوراً!", usage: "حريق في مكان مغلق" },
+                { german: "Ich kann nicht atmen!", arabic: "لا أستطيع التنفس!", usage: "طوارئ تنفسية" },
+                { german: "Starke Brustschmerzen!", arabic: "آلام صدر شديدة!", usage: "اشتباه نوبة قلبية" },
+                { german: "Ich bin allergisch gegen [Penicillin]!", arabic: "لدي حساسية من [البنسلين]!", usage: "تجنب الخطر" },
+                { german: "Wo ist die Notaufnahme?", arabic: "أين قسم الطوارئ؟", usage: "في المستشفى" },
+                { german: "Mein Kind ist verloren!", arabic: "طفلي مفقود!", usage: "فقدان طفل" },
+                { german: "Ich wurde überfallen!", arabic: "تم الاعتداء عليّ!", usage: "اعتداء جسدي" },
+                { german: "Mein Pass/Handy wurde gestohlen!", arabic: "جوازي/هاتفي سُرق!", usage: "سرقة وثائق" },
+                { german: "Unfall! Hier ist ein Unfall passiert!", arabic: "حادث! حصل حادث هنا!", usage: "إبلاغ عن حادث" },
+                { german: "Wo ist der nächste Ausgang?", arabic: "أين أقرب مخرج؟", usage: "حالات الإخلاء" },
+                { german: "Bleiben Sie bei mir! Hilfe kommt!", arabic: "ابقوا معي! المساعدة قادمة!", usage: "تهدئة المصاب" },
+                { german: "Wo ist die nächste Polizeistation?", arabic: "أين أقرب مركز شرطة؟", usage: "جرائم غير عاجلة" },
+                { german: "Spricht jemand Englisch?", arabic: "هل يتحدث أحد الإنجليزية؟", usage: "التواصل مع المنقذين" }
+            ]
+        };
 
