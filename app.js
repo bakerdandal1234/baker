@@ -449,3 +449,61 @@ function toggleExamples(card, sentence) {
   card.appendChild(exampleBox);
 }
 
+
+
+const aiBtn = document.createElement('button');
+aiBtn.className = 'ai-btn';
+aiBtn.textContent = '🧠 أمثلة فهم ذكي';
+
+aiBtn.onclick = (e) => {
+  e.stopPropagation();
+  loadAIExamples(card, sentence);
+};
+async function loadAIExamples(card, sentence) {
+  let box = card.querySelector('.ai-examples');
+
+  if (box) {
+    box.remove();
+    return;
+  }
+
+  box = document.createElement('div');
+  box.className = 'ai-examples';
+  box.textContent = '⏳ يتم توليد أمثلة ذكية...';
+  card.appendChild(box);
+
+  try {
+    const res = await fetch('/api/generate-examples', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        german: sentence.german,
+        level: sentence.level
+      })
+    });
+
+    const data = await res.json();
+    box.innerHTML = '';
+
+    data.examples.forEach(ex => {
+      const row = document.createElement('div');
+      row.className = 'example-row';
+
+      const text = document.createElement('span');
+      text.textContent = '• ' + ex;
+
+      const soundBtn = document.createElement('button');
+      soundBtn.textContent = '🔊';
+      soundBtn.onclick = () => speakText(ex, soundBtn);
+
+      row.appendChild(text);
+      row.appendChild(soundBtn);
+      box.appendChild(row);
+    });
+
+  } catch (err) {
+    box.textContent = '❌ فشل تحميل الأمثلة';
+  }
+}
+
+
