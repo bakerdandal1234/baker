@@ -180,7 +180,6 @@ aiBtn.onclick = (e) => {
     card.appendChild(favBtn);
     card.appendChild(speakBtn);
     card.appendChild(levelBadge);
-    card.appendChild(exampleBtn);
     card.appendChild(germanDiv);
     card.appendChild(arabicDiv);
     card.appendChild(aiBtn);
