@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جمل ألمانية قصيرة للحياة اليومية</title>
+
+    <!-- ResponsiveVoice API -->
+    <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
+
+    <!-- ربط ملفات CSS و JS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <button class="dark-mode-toggle" id="darkModeToggle" onclick="toggleDarkMode()">
+        🌙
+    </button>
+
+    <div class="container">
+        <h1>🗣️ جمل ألمانية قصيرة</h1>
+        <p class="subtitle">جمل من 3-5 كلمات للحياة اليومية - اضغط 🔊 للاستماع</p>
+
+        <input type="text" id="searchBox" class="search-box" placeholder="ابحث عن جملة..." oninput="searchSentences()">
+
+        <div class="tabs">
+            <!-- الأزرار هنا -->
+        </div>
+
+        <!-- أماكن الجمل -->
+        <div id="favorites" class="tab-content"></div>
+        <div id="searchResults" class="tab-content"></div>
+        <div id="shopping" class="tab-content active"></div>
+        <!-- باقي الأقسام -->
+
+    </div>
+
+    <!-- ملفات الجافاسكربت -->
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
