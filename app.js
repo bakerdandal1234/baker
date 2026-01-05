@@ -132,6 +132,15 @@ function renderSentenceCard(sentence) {
     const card = document.createElement('div');
     card.className = 'sentence-card';
 
+
+    const exampleBtn = document.createElement('button');
+    exampleBtn.className = 'example-btn';
+    exampleBtn.textContent = '📘 أمثلة أخرى';
+    exampleBtn.onclick = function (e) {
+    e.stopPropagation();
+  toggleExamples(card, sentence);
+};
+
     const speakBtn = document.createElement('button');
     speakBtn.className = 'speak-btn';
     speakBtn.innerHTML = '🔊';
@@ -168,6 +177,7 @@ function renderSentenceCard(sentence) {
     card.appendChild(favBtn);
     card.appendChild(speakBtn);
     card.appendChild(levelBadge);
+    card.appendChild(exampleBtn);
     card.appendChild(germanDiv);
     card.appendChild(arabicDiv);
     card.appendChild(usageDiv);
