@@ -21,7 +21,7 @@ const sentencesData = {
   { german: "Kann ich eine Quittung haben?", arabic: "هل يمكنني الحصول على فاتورة؟", usage: "بعد الدفع", level: "B1" },
   { german: "Ich möchte dies zurückgeben.", arabic: "أريد إرجاع هذا.", usage: "عند الإرجاع", level: "B1" },
   { german: "Dieser Artikel ist beschädigt.", arabic: "هذا المنتج تالف.", usage: "للتذمر عن منتج", level: "B1" }
-]
+],
 transport: [
   { german: "Wo ist der Bahnhof?", arabic: "أين المحطة؟", usage: "عند البحث", level: "A1" },
   { german: "Wo ist die U-Bahn?", arabic: "أين المترو؟", usage: "عند البحث", level: "A1" },
@@ -36,7 +36,7 @@ transport: [
 
   { german: "Ich habe mich verlaufen.", arabic: "لقد ضللت الطريق", usage: "طلب المساعدة", level: "B1" },
   { german: "Darf ich Fahrrad mitnehmen?", arabic: "هل يُسمح بحمل الدراجة؟", usage: "للمسافرين بالدراجات", level: "B1" }
-]
+],
 
 restaurant: [
   { german: "Haben Sie einen Tisch frei?", arabic: "هل لديكم طاولة فارغة؟", usage: "عند الدخول", level: "A1" },
@@ -47,7 +47,7 @@ restaurant: [
   { german: "Ich bin Vegetarier.", arabic: "أنا نباتي", usage: "تحديد النظام الغذائي", level: "A2" },
 
   { german: "Ich bin allergisch gegen Nüsse.", arabic: "لدي حساسية من المكسرات", usage: "تجنب الخطر", level: "B1" }
-]
+],
 daily: [
   { german: "Guten Morgen/Tag/Abend!", arabic: "صباح/يوم/مساء الخير!", usage: "تحية حسب الوقت", level: "A1" },
   { german: "Wie geht's?", arabic: "كيف حالك؟", usage: "تحية غير رسمية", level: "A1" },
@@ -79,7 +79,7 @@ daily: [
   { german: "Muss ich ins Krankenhaus?", arabic: "هل يجب أن أذهب للمستشفى؟", usage: "تقييم الخطورة", level: "B1" },
   { german: "Ich bin seit gestern krank.", arabic: "أنا مريض منذ البارحة", usage: "وصف المدة", level: "A1" },
   { german: "Ich brauche ein Rezept.", arabic: "أحتاج وصفة طبية", usage: "طلب الدواء", level: "A1" }
-]
+],
 
            work: [
   { german: "Haben Sie einen Moment Zeit?", arabic: "هل لديك دقيقة من الوقت؟", usage: "طلب الانتباه", level: "A1" },
@@ -151,24 +151,10 @@ emergency: [
   { german: "Spricht jemand Englisch?", arabic: "هل يتحدث أحد الإنجليزية؟", usage: "التواصل مع المنقذين", level: "A2" }
 ],
 
-doctor: [
-  { german: "Mir geht's nicht gut.", arabic: "لا أشعر بحال جيدة", usage: "وصف الحالة", level: "A1" },
-  { german: "Ich habe starke Schmerzen.", arabic: "لدي آلام شديدة", usage: "عند الألم", level: "A2" },
-  { german: "Mir tut der Kopf/Rücken/Bauch weh.", arabic: "رأسي/ظهري/بطني يؤلمني", usage: "تحديد مكان الألم", level: "A2" },
-  { german: "Ich habe hohes Fieber.", arabic: "لدي حمى عالية", usage: "عند المرض", level: "A1" },
-  { german: "Ich habe starken Husten.", arabic: "لدي سعال شديد", usage: "أعراض تنفسية", level: "A2" },
-  { german: "Mir ist sehr schlecht/schwindlig.", arabic: "أشعر بغثيان/دوار شديد", usage: "أعراض خطيرة", level: "B1" },
-  { german: "Ich habe Probleme beim Atmen.", arabic: "لدي مشاكل في التنفس", usage: "طوارئ", level: "B1" },
-  { german: "Ich bin allergisch gegen Penicillin/Nüsse.", arabic: "لدي حساسية من البنسلين/المكسرات", usage: "تجنب الخطر", level: "A2" },
-  { german: "Wo ist die nächste Apotheke?", arabic: "أين أقرب صيدلية؟", usage: "طلب المساعدة", level: "A1" },
-  { german: "Ich habe einen Termin um 10.", arabic: "لدي موعد الساعة 10", usage: "تأكيد الموعد", level: "A1" },
-  { german: "Ich habe meine Versicherungskarte vergessen.", arabic: "نسيت بطاقة التأمين", usage: "إبلاغ عن مشكلة", level: "A2" },
-  { german: "Können Sie mir etwas verschreiben?", arabic: "هل يمكنك وصف دواء؟", usage: "طلب العلاج", level: "A2" },
-  { german: "Muss ich ins Krankenhaus?", arabic: "هل يجب أن أذهب للمستشفى؟", usage: "تقييم الخطورة", level: "B1" },
-  { german: "Ich bin seit gestern krank.", arabic: "أنا مريض منذ البارحة", usage: "وصف المدة", level: "A1" },
-  { german: "Ich brauche ein Rezept.", arabic: "أحتاج وصفة طبية", usage: "طلب الدواء", level: "A1" }
-]
 
            
         };
+
+
+
 
