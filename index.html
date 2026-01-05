@@ -9,7 +9,7 @@
     <!-- ResponsiveVoice API -->
     <script src="https://code.responsivevoice.org/responsivevoice.js"></script>
 
-    <!-- ربط ملفات CSS و JS -->
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -25,20 +25,68 @@
         <input type="text" id="searchBox" class="search-box" placeholder="ابحث عن جملة..." oninput="searchSentences()">
 
         <div class="tabs">
-            <!-- الأزرار هنا -->
+            <button class="tab-button" onclick="openTab(event, 'favorites')">⭐ مفضلة (<span id="favCount">0</span>)</button>
+            <button class="tab-button active" onclick="openTab(event, 'shopping')">🏪 تسوق</button>
+            <button class="tab-button" onclick="openTab(event, 'transport')">🚌 مواصلات</button>
+            <button class="tab-button" onclick="openTab(event, 'restaurant')">🍽️ مطعم</button>
+            <button class="tab-button" onclick="openTab(event, 'daily')">💬 يومية</button>
+            <button class="tab-button" onclick="openTab(event, 'doctor')">🏥 طبيب</button>
+            <button class="tab-button" onclick="openTab(event, 'work')">💼 عمل</button>
+            <button class="tab-button" onclick="openTab(event, 'home')">🏠 بيت</button>
+            <button class="tab-button" onclick="openTab(event, 'phone')">📞 هاتف</button>
+            <button class="tab-button" onclick="openTab(event, 'emergency')">🆘 طوارئ</button>
         </div>
 
-        <!-- أماكن الجمل -->
-        <div id="favorites" class="tab-content"></div>
-        <div id="searchResults" class="tab-content"></div>
-        <div id="shopping" class="tab-content active"></div>
-        <!-- باقي الأقسام -->
+        <div id="favorites" class="tab-content">
+            <div class="sentences-grid" id="favoritesGrid"></div>
+            <div id="noFavorites" class="no-results">لا توجد جمل مفضلة</div>
+        </div>
 
+        <div id="searchResults" class="tab-content">
+            <div class="sentences-grid" id="searchResultsGrid"></div>
+        </div>
+
+        <div id="shopping" class="tab-content active">
+            <div class="sentences-grid"></div>
+        </div>
+
+        <div id="transport" class="tab-content">
+            <div class="sentences-grid"></div>
+        </div>
+
+        <div id="restaurant" class="tab-content">
+            <div class="sentences-grid"></div>
+        </div>
+
+        <div id="daily" class="tab-content">
+            <div class="sentences-grid"></div>
+        </div>
+
+        <div id="doctor" class="tab-content">
+            <div class="sentences-grid"></div>
+        </div>
+
+        <div id="work" class="tab-content">
+            <div class="sentences-grid"></div>
+        </div>
+
+        <div id="home" class="tab-content">
+            <div class="sentences-grid"></div>
+        </div>
+
+        <div id="phone" class="tab-content">
+            <div class="sentences-grid"></div>
+        </div>
+
+        <div id="emergency" class="tab-content">
+            <div class="sentences-grid"></div>
+        </div>
     </div>
 
-    <!-- ملفات الجافاسكربت -->
+    <!-- Scripts -->
     <script src="data.js"></script>
     <script src="app.js"></script>
 </body>
 
 </html>
+
