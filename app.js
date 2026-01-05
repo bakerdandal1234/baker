@@ -133,12 +133,15 @@ function renderSentenceCard(sentence) {
     card.className = 'sentence-card';
 
 
-    const exampleBtn = document.createElement('button');
-    exampleBtn.className = 'example-btn';
-    exampleBtn.textContent = '🧠 أمثلة ذكية';
-    exampleBtn.onclick = function (e) {
-    e.stopPropagation();
-  toggleExamples(card, sentence);
+
+
+    const aiBtn = document.createElement('button');
+aiBtn.className = 'ai-btn';
+aiBtn.textContent = '🧠 أمثلة فهم ذكي';
+
+aiBtn.onclick = (e) => {
+  e.stopPropagation();
+  loadAIExamples(card, sentence);
 };
 
     const speakBtn = document.createElement('button');
@@ -180,6 +183,7 @@ function renderSentenceCard(sentence) {
     card.appendChild(exampleBtn);
     card.appendChild(germanDiv);
     card.appendChild(arabicDiv);
+    card.appendChild(aiBtn);
     card.appendChild(usageDiv);
 
     card.onclick = function () {
@@ -451,14 +455,7 @@ function toggleExamples(card, sentence) {
 
 
 
-const aiBtn = document.createElement('button');
-aiBtn.className = 'ai-btn';
-aiBtn.textContent = '🧠 أمثلة فهم ذكي';
 
-aiBtn.onclick = (e) => {
-  e.stopPropagation();
-  loadAIExamples(card, sentence);
-};
 async function loadAIExamples(card, sentence) {
   let box = card.querySelector('.ai-examples');
 
