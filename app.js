@@ -424,10 +424,26 @@ function toggleExamples(card, sentence) {
     exampleBox.textContent = "لا توجد أمثلة إضافية حالياً";
   } else {
     sentence.examples.forEach(ex => {
-      const p = document.createElement('p');
-      p.textContent = "• " + ex;
-      exampleBox.appendChild(p);
-    });
+  const row = document.createElement('div');
+  row.className = 'example-row';
+
+  const text = document.createElement('span');
+  text.textContent = "• " + ex;
+
+  const soundBtn = document.createElement('button');
+  soundBtn.className = 'sound-btn';
+  soundBtn.textContent = '🔊';
+
+  soundBtn.onclick = (e) => {
+    e.stopPropagation();
+    speakText(ex, soundBtn); // 👈 إعادة استخدام نفس الدالة
+  };
+
+  row.appendChild(text);
+  row.appendChild(soundBtn);
+  exampleBox.appendChild(row);
+});
+
   }
 
   card.appendChild(exampleBox);
