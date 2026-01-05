@@ -407,3 +407,29 @@ if (document.readyState === 'loading') {
 } else {
     initApp();
 }
+
+
+function toggleExamples(card, sentence) {
+  let exampleBox = card.querySelector('.examples-box');
+
+  if (exampleBox) {
+    exampleBox.remove();
+    return;
+  }
+
+  exampleBox = document.createElement('div');
+  exampleBox.className = 'examples-box';
+
+  if (!sentence.examples || sentence.examples.length === 0) {
+    exampleBox.textContent = "لا توجد أمثلة إضافية حالياً";
+  } else {
+    sentence.examples.forEach(ex => {
+      const p = document.createElement('p');
+      p.textContent = "• " + ex;
+      exampleBox.appendChild(p);
+    });
+  }
+
+  card.appendChild(exampleBox);
+}
+
