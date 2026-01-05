@@ -146,6 +146,12 @@ function renderSentenceCard(sentence) {
     favBtn.onclick = function (e) {
         toggleFavBtn(this, e, sentence);
     };
+    const levelBadge = document.createElement('div');
+    levelBadge.className = `level-badge level-${sentence.level}`;
+    levelBadge.textContent = sentence.level;
+
+    card.appendChild(levelBadge);
+
 
     const germanDiv = document.createElement('div');
     germanDiv.className = 'german';
@@ -161,6 +167,7 @@ function renderSentenceCard(sentence) {
 
     card.appendChild(favBtn);
     card.appendChild(speakBtn);
+    card.appendChild(levelBadge);
     card.appendChild(germanDiv);
     card.appendChild(arabicDiv);
     card.appendChild(usageDiv);
