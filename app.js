@@ -135,7 +135,7 @@ function renderSentenceCard(sentence) {
 
     const exampleBtn = document.createElement('button');
     exampleBtn.className = 'example-btn';
-    exampleBtn.textContent = '📘 أمثلة أخرى';
+    exampleBtn.textContent = '🧠 أمثلة ذكية';
     exampleBtn.onclick = function (e) {
     e.stopPropagation();
   toggleExamples(card, sentence);
