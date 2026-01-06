@@ -1,5 +1,6 @@
+// server.js - استخدام Google Gemini (مجاني!)
 import express from "express";
-import OpenAI from "openai";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import dotenv from "dotenv";
 import cors from "cors";
 
@@ -13,31 +14,69 @@ app.use(cors({
 }));
 app.use(express.json());
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY,
-  baseURL: "https://openrouter.ai/api/v1" // إذا كنت تستخدم OpenRouter
+// Google Gemini (مجاني!)
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+app.get("/", (req, res) => {
+  res.json({ 
+    status: "✅ Server running with FREE Google Gemini!",
+    model: "Gemini 1.5 Flash"
+  });
 });
 
 app.post("/api/generate-examples", async (req, res) => {
   const { german, level } = req.body;
 
-  const prompt = `أعطني 3 جمل ألمانية جديدة بنفس معنى: "${german}" بمستوى ${level} بدون ترجمة`;
+  console.log("📥 Request:", { german, level });
+
+  if (!german || !level) {
+    return res.status(400).json({ 
+      error: "الرجاء إرسال الجملة الألمانية والمستوى" 
+    });
+  }
+
+  const prompt = `أنت معلم لغة ألمانية. أعطني 3 جمل ألمانية جديدة بنفس معنى: "${german}" بمستوى ${level}
+
+القواعد:
+- 3 جمل فقط
+- بدون ترجمة
+- بدون ترقيم
+- كل جملة في سطر منفصل`;
 
   try {
-    const completion = await openai.chat.completions.create({
-      model: "openai/gpt-3.5-turbo", // ✅ اسم صحيح لـ OpenRouter
-      messages: [{ role: "user", content: prompt }]
-    });
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    
+    console.log("✅ Gemini Response:", text);
 
-    const text = completion.choices[0].message.content;
-    const examples = text.split("\n").map(l => l.replace(/^[-•\d.]+/, "").trim()).filter(Boolean);
+    // Extract sentences
+    const examples = text
+      .split("\n")
+      .map(line => line.replace(/^[-•\d.)\s*]+/, "").trim())
+      .filter(line => line.length > 10 && /[a-zA-ZäöüßÄÖÜ]/.test(line))
+      .slice(0, 3);
 
+    if (examples.length === 0) {
+      return res.status(500).json({ 
+        error: "لم يتم إنشاء أمثلة. حاول مرة أخرى." 
+      });
+    }
+
+    console.log("📤 Sending:", examples);
     res.json({ examples });
+
   } catch (err) {
-    console.error("Error:", err.response?.data || err.message);
-    res.status(500).json({ error: "حدث خطأ أثناء توليد الأمثلة" });
+    console.error("❌ Error:", err.message);
+    res.status(500).json({ 
+      error: "حدث خطأ أثناء توليد الأمثلة",
+      details: err.message
+    });
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
+  console.log(`🆓 Using FREE Google Gemini API`);
+});
