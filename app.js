@@ -105,10 +105,32 @@ function renderFavorites() {
 //   });
 // }
 
-function speakText(text, btn) {
+let voicesLoaded = false;
+
+function loadVoices() {
+  return new Promise(resolve => {
+    let voices = speechSynthesis.getVoices();
+    if (voices.length) {
+      voicesLoaded = true;
+      resolve(voices);
+    } else {
+      speechSynthesis.onvoiceschanged = () => {
+        voicesLoaded = true;
+        resolve(speechSynthesis.getVoices());
+      };
+    }
+  });
+}
+
+async function speakText(text, btn) {
   if (!('speechSynthesis' in window)) {
     alert('المتصفح لا يدعم الصوت');
     return;
+  }
+
+  // 👈 تأكد من تحميل الأصوات
+  if (!voicesLoaded) {
+    await loadVoices();
   }
 
   speechSynthesis.cancel();
@@ -129,6 +151,7 @@ function speakText(text, btn) {
 
   speechSynthesis.speak(utterance);
 }
+
 
 
 // ================== CARD ==================
