@@ -126,7 +126,6 @@ function renderFavorites() {
 //   });
 // }
 
-let currentBtn = null;
 let isSpeaking = false;
 
 function speakText(text, btn) {
