@@ -94,65 +94,16 @@ function renderFavorites() {
 }
 
 // ================== SPEECH ==================
-// function speakText(text, btn) {
-//   if (currentBtn) currentBtn.classList.remove('speaking');
-//   currentBtn = btn;
-//   btn.classList.add('speaking');
+function speakText(text, btn) {
+  if (currentBtn) currentBtn.classList.remove('speaking');
+  currentBtn = btn;
+  btn.classList.add('speaking');
 
-//   responsiveVoice.speak(text, "Deutsch Female", {
-//     rate: 0.85,
-//     onend: () => btn.classList.remove('speaking')
-//   });
-// }
-
-let voicesLoaded = false;
-
-function loadVoices() {
-  return new Promise(resolve => {
-    let voices = speechSynthesis.getVoices();
-    if (voices.length) {
-      voicesLoaded = true;
-      resolve(voices);
-    } else {
-      speechSynthesis.onvoiceschanged = () => {
-        voicesLoaded = true;
-        resolve(speechSynthesis.getVoices());
-      };
-    }
+  responsiveVoice.speak(text, "Deutsch Female", {
+    rate: 0.85,
+    onend: () => btn.classList.remove('speaking')
   });
 }
-
-async function speakText(text, btn) {
-  if (!('speechSynthesis' in window)) {
-    alert('المتصفح لا يدعم الصوت');
-    return;
-  }
-
-  // 👈 تأكد من تحميل الأصوات
-  if (!voicesLoaded) {
-    await loadVoices();
-  }
-
-  speechSynthesis.cancel();
-
-  if (btn) {
-    if (currentBtn) currentBtn.classList.remove('speaking');
-    currentBtn = btn;
-    btn.classList.add('speaking');
-  }
-
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang = 'de-DE';
-  utterance.rate = 0.85;
-
-  utterance.onend = () => {
-    if (btn) btn.classList.remove('speaking');
-  };
-
-  speechSynthesis.speak(utterance);
-}
-
-
 
 // ================== CARD ==================
 function renderSentenceCard(sentence) {
@@ -192,7 +143,7 @@ function renderSentenceCard(sentence) {
 
   const aiBtn = document.createElement('button');
   aiBtn.className = 'ai-btn';
-  aiBtn.textContent = '🧠 أمثلة ذكية ';
+  aiBtn.textContent = '🧠 AI ';
   aiBtn.onclick = e => {
     e.stopPropagation();
     loadAIExamples(card, sentence);
@@ -208,7 +159,7 @@ function renderSentenceCard(sentence) {
     usage
   );
 
-  // card.onclick = () => speakText(sentence.german, speakBtn);
+  card.onclick = () => speakText(sentence.german, speakBtn);
 
   return card;
 }
@@ -247,7 +198,7 @@ async function loadAIExamples(card, sentence) {
 
   box = document.createElement('div');
   box.className = 'ai-examples';
-  box.textContent = '🤖 الذكاء الاصطناعي يفكّر...';
+  box.textContent = '⏳ يتم توليد أمثلة...';
   card.appendChild(box);
 
   const res = await fetch('https://baker-l14t.onrender.com/api/generate-examples', {
@@ -273,25 +224,6 @@ async function loadAIExamples(card, sentence) {
     box.appendChild(row);
   });
 }
-
-
-
-function initAudio() {
-  if (!('speechSynthesis' in window)) {
-    alert('المتصفح لا يدعم الصوت');
-    return;
-  }
-
-  const u = new SpeechSynthesisUtterance('Hallo');
-  u.lang = 'de-DE';
-  u.volume = 0;
-  speechSynthesis.speak(u);
-
-  const btn = document.getElementById('enableAudioBtn');
-  if (btn) btn.style.display = 'none';
-}
-
-
 
 // ================== INIT ==================
 function initApp() {
