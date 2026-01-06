@@ -94,20 +94,29 @@ function renderFavorites() {
 }
 
 // ================== SPEECH ==================
-// ✅ الحل: تشغيل الصوت مباشرة بدون أي تأخير
+// ✅ مع تنبيهات تفصيلية لمعرفة المشكلة
 
 function speakText(text, btn) {
+  alert('🔍 Step 1: speakText called with text: ' + text);
+  
   if (!window.speechSynthesis) {
-    alert("النطق غير مدعوم في هذا المتصفح");
+    alert('❌ ERROR: speechSynthesis غير مدعوم في المتصفح!');
     return;
   }
+  
+  alert('✅ Step 2: speechSynthesis موجود');
 
   const synth = window.speechSynthesis;
   
   // إيقاف أي صوت سابق
   synth.cancel();
+  alert('✅ Step 3: تم إيقاف الأصوات السابقة');
+  
   if (typeof responsiveVoice !== "undefined") {
+    alert('✅ Step 4: ResponsiveVoice موجود، سيتم استخدامه');
     responsiveVoice.cancel();
+  } else {
+    alert('⚠️ Step 4: ResponsiveVoice غير موجود');
   }
 
   // تحديث UI
@@ -116,64 +125,92 @@ function speakText(text, btn) {
   }
   btn.classList.add('speaking');
   currentBtn = btn;
+  
+  alert('✅ Step 5: تم تحديث UI');
 
-  // محاولة استخدام ResponsiveVoice أولاً (إن كان متوفراً)
+  // محاولة استخدام ResponsiveVoice أولاً
   if (typeof responsiveVoice !== "undefined" && responsiveVoice.voiceSupport()) {
     try {
+      alert('🎤 Step 6: محاولة ResponsiveVoice...');
       responsiveVoice.speak(text, "Deutsch Female", {
         rate: 0.8,
         onend: () => {
+          alert('✅ ResponsiveVoice انتهى');
           btn.classList.remove('speaking');
           currentBtn = null;
         },
-        onerror: () => {
-          // إذا فشل ResponsiveVoice، استخدم Web Speech API
+        onerror: (err) => {
+          alert('❌ ResponsiveVoice Error: ' + err);
           fallbackToWebSpeech(text, btn);
         }
       });
       return;
     } catch (e) {
-      console.log("ResponsiveVoice failed, using fallback");
+      alert('❌ ResponsiveVoice Exception: ' + e.message);
     }
   }
 
   // استخدام Web Speech API مباشرة
+  alert('🎤 Step 7: استخدام Web Speech API');
   fallbackToWebSpeech(text, btn);
 }
 
 function fallbackToWebSpeech(text, btn) {
+  alert('🔊 fallbackToWebSpeech: بدء التشغيل');
+  
   const synth = window.speechSynthesis;
   
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = 'de-DE';
   utter.rate = 0.9;
+  
+  alert('✅ تم إنشاء SpeechSynthesisUtterance');
 
-  // اختيار صوت ألماني إن وُجد
+  // اختيار صوت ألماني
   const voices = synth.getVoices();
+  alert('✅ عدد الأصوات المتاحة: ' + voices.length);
+  
   const deVoice = voices.find(v => v.lang.startsWith('de'));
   if (deVoice) {
     utter.voice = deVoice;
+    alert('✅ تم اختيار صوت ألماني: ' + deVoice.name);
+  } else {
+    alert('⚠️ لم يتم العثور على صوت ألماني');
   }
 
+  utter.onstart = () => {
+    alert('✅ بدأ التشغيل!');
+  };
+
   utter.onend = () => {
+    alert('✅ انتهى التشغيل');
     btn.classList.remove('speaking');
     currentBtn = null;
   };
 
-  utter.onerror = () => {
+  utter.onerror = (e) => {
+    alert('❌ خطأ في التشغيل: ' + e.error + ' - ' + e.message);
     btn.classList.remove('speaking');
     currentBtn = null;
   };
 
-  // ⚠️ مهم جداً: تشغيل الصوت مباشرة بدون أي async
-  synth.speak(utter);
+  // تشغيل الصوت
+  alert('🎬 محاولة التشغيل الآن...');
+  try {
+    synth.speak(utter);
+    alert('✅ تم استدعاء synth.speak()');
+  } catch (e) {
+    alert('❌ Exception في synth.speak(): ' + e.message);
+  }
 }
 
 // تحميل الأصوات عند بداية الصفحة
 if (window.speechSynthesis) {
+  alert('🎵 تحميل الأصوات...');
   window.speechSynthesis.getVoices();
   window.speechSynthesis.onvoiceschanged = () => {
-    window.speechSynthesis.getVoices();
+    const voices = window.speechSynthesis.getVoices();
+    alert('✅ تم تحميل ' + voices.length + ' صوت');
   };
 }
 
@@ -192,10 +229,9 @@ function renderSentenceCard(sentence) {
   const speakBtn = document.createElement('button');
   speakBtn.className = 'speak-btn';
   speakBtn.textContent = '🔊';
-  // ✅ الحل: استدعاء مباشر بدون stopPropagation
   speakBtn.onclick = e => {
+    alert('🖱️ تم الضغط على زر الصوت');
     e.stopPropagation();
-    // تشغيل الصوت فوراً
     speakText(sentence.german, speakBtn);
   };
 
@@ -233,8 +269,8 @@ function renderSentenceCard(sentence) {
     usage
   );
 
-  // ✅ تشغيل الصوت عند الضغط على البطاقة نفسها
   card.onclick = () => {
+    alert('🖱️ تم الضغط على البطاقة');
     speakText(sentence.german, speakBtn);
   };
 
@@ -300,8 +336,8 @@ async function loadAIExamples(card, sentence) {
       
       const exampleSpeakBtn = document.createElement('button');
       exampleSpeakBtn.textContent = '🔊';
-      // ✅ الحل: تشغيل مباشر للأمثلة أيضاً
       exampleSpeakBtn.onclick = e => {
+        alert('🖱️ تم الضغط على مثال AI');
         e.stopPropagation();
         speakText(ex, exampleSpeakBtn);
       };
@@ -312,15 +348,18 @@ async function loadAIExamples(card, sentence) {
     });
   } catch (error) {
     box.textContent = '❌ حدث خطأ في تحميل الأمثلة';
+    alert('❌ AI Error: ' + error.message);
     console.error('AI Examples Error:', error);
   }
 }
 
 // ================== INIT ==================
 function initApp() {
+  alert('🚀 تم بدء التطبيق');
   loadDarkMode();
   updateFavCount();
   renderSentences('shopping');
+  alert('✅ تم تحميل التطبيق بنجاح');
 }
 
 // تشغيل التطبيق عند تحميل الصفحة
