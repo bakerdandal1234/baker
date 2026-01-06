@@ -94,14 +94,35 @@ function renderFavorites() {
 }
 
 // ================== SPEECH ==================
+// function speakText(text, btn) {
+//   if (currentBtn) currentBtn.classList.remove('speaking');
+//   currentBtn = btn;
+//   btn.classList.add('speaking');
+
+//   responsiveVoice.speak(text, "Deutsch Female", {
+//     rate: 0.85,
+//     onend: () => btn.classList.remove('speaking')
+//   });
+// }
+
 function speakText(text, btn) {
+  // اختبار 1: هل الزر يشتغل أصلاً؟
+  alert('تم الضغط على الزر!');
+  
+  // اختبار 2: هل المكتبة موجودة؟
+  if (!responsiveVoice) {
+    alert('خطأ: ResponsiveVoice غير موجود!');
+    return;
+  }
+  
   if (currentBtn) currentBtn.classList.remove('speaking');
   currentBtn = btn;
   btn.classList.add('speaking');
 
   responsiveVoice.speak(text, "Deutsch Female", {
     rate: 0.85,
-    onend: () => btn.classList.remove('speaking')
+    onend: () => btn.classList.remove('speaking'),
+    onerror: (err) => alert('خطأ في الصوت: ' + err) // اختبار 3
   });
 }
 
