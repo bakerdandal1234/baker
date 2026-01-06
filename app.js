@@ -44,10 +44,7 @@ function loadDarkMode() {
 
 // ================== FAVORITES ==================
 function updateFavCount() {
-  const favCountElement = document.getElementById('favCount');
-  if (favCountElement) {
-    favCountElement.textContent = favorites.length;
-  }
+  document.getElementById('favCount').textContent = favorites.length;
 }
 
 function toggleFavorite(sentence, e) {
@@ -78,8 +75,6 @@ function renderFavorites() {
   const grid = document.getElementById('favoritesGrid');
   const noFav = document.getElementById('noFavorites');
 
-  if (!grid) return;
-
   grid.innerHTML = '';
 
   const filtered = favorites.filter(
@@ -87,50 +82,27 @@ function renderFavorites() {
   );
 
   if (filtered.length === 0) {
-    if (noFav) noFav.style.display = 'block';
+    noFav.style.display = 'block';
     grid.style.display = 'none';
     return;
   }
 
-  if (noFav) noFav.style.display = 'none';
+  noFav.style.display = 'none';
   grid.style.display = 'grid';
 
   filtered.forEach(s => grid.appendChild(renderSentenceCard(s)));
 }
 
-// ================== VOICE UTILS ==================
-function getGermanVoice() {
-  const voices = window.speechSynthesis.getVoices();
-  return voices.find(v => v.lang.startsWith('de')) || null;
-}
+// ================== SPEECH ==================
+function speakText(text, btn) {
+  if (currentBtn) currentBtn.classList.remove('speaking');
+  currentBtn = btn;
+  btn.classList.add('speaking');
 
-function speakText(text, btn = null) {
-  const synth = window.speechSynthesis;
-  synth.cancel();
-
-  if (btn) {
-    if (currentBtn) currentBtn.classList.remove('speaking');
-    currentBtn = btn;
-    btn.classList.add('speaking');
-  }
-
-  const utter = new SpeechSynthesisUtterance(text);
-  utter.lang = 'de-DE';
-  utter.rate = 0.9;
-
-  const deVoice = getGermanVoice();
-  if (deVoice) utter.voice = deVoice;
-
-  utter.onend = () => {
-    if (btn) btn.classList.remove('speaking');
-    currentBtn = null;
-  };
-  utter.onerror = () => {
-    if (btn) btn.classList.remove('speaking');
-    currentBtn = null;
-  };
-
-  synth.speak(utter);
+  responsiveVoice.speak(text, "Deutsch Female", {
+    rate: 0.85,
+    onend: () => btn.classList.remove('speaking')
+  });
 }
 
 // ================== CARD ==================
@@ -138,62 +110,56 @@ function renderSentenceCard(sentence) {
   const card = document.createElement('div');
   card.className = 'sentence-card';
 
-  // زر المفضلة
   const favBtn = document.createElement('button');
   favBtn.className = 'favorite-btn';
   favBtn.textContent = isFavorite(sentence) ? '★' : '☆';
-  favBtn.addEventListener('click', function(e) {
-    e.stopPropagation();
-    const isFav = toggleFavorite(sentence, e);
-    this.textContent = isFav ? '★' : '☆';
-  });
+  favBtn.onclick = e => {
+    favBtn.textContent = toggleFavorite(sentence, e) ? '★' : '☆';
+  };
 
-  // زر الصوت
   const speakBtn = document.createElement('button');
   speakBtn.className = 'speak-btn';
   speakBtn.textContent = '🔊';
-  speakBtn.addEventListener('click', function(e) {
+  speakBtn.onclick = e => {
     e.stopPropagation();
-    e.preventDefault();
-    speakText(sentence.german, this);
-  });
+    speakText(sentence.german, speakBtn);
+  };
 
-  // المستوى
   const level = document.createElement('div');
   level.className = `level-badge level-${sentence.level}`;
   level.textContent = sentence.level;
 
-  // النص الألماني
   const german = document.createElement('div');
   german.className = 'german';
   german.textContent = sentence.german;
 
-  // النص العربي
   const arabic = document.createElement('div');
   arabic.className = 'arabic';
   arabic.textContent = sentence.arabic;
 
-  // الاستخدام
   const usage = document.createElement('div');
   usage.className = 'usage';
   usage.innerHTML = `<b>متى تستخدمها:</b> ${sentence.usage}`;
 
-  // زر AI
   const aiBtn = document.createElement('button');
   aiBtn.className = 'ai-btn';
   aiBtn.textContent = '🧠 AI ';
-  aiBtn.addEventListener('click', function(e) {
+  aiBtn.onclick = e => {
     e.stopPropagation();
     loadAIExamples(card, sentence);
-  });
+  };
 
-  // تجميع العناصر
-  card.append(favBtn, speakBtn, level, german, arabic, aiBtn, usage);
+  card.append(
+    favBtn,
+    speakBtn,
+    level,
+    german,
+    arabic,
+    aiBtn,
+    usage
+  );
 
-  // الضغط على البطاقة لتشغيل الصوت
-  card.addEventListener('click', function() {
-    speakText(sentence.german, speakBtn);
-  });
+  card.onclick = () => speakText(sentence.german, speakBtn);
 
   return card;
 }
@@ -201,17 +167,13 @@ function renderSentenceCard(sentence) {
 // ================== RENDER TABS ==================
 function renderSentences(tabId) {
   const grid = document.querySelector(`#${tabId} .sentences-grid`);
-  if (!grid) return;
-
-  if (!sentencesData || !sentencesData[tabId]) return;
+  if (!grid || !sentencesData[tabId]) return;
 
   grid.innerHTML = '';
 
-  const sentences = sentencesData[tabId].filter(
-    s => currentLevel === 'all' || s.level === currentLevel
-  );
-
-  sentences.forEach(s => grid.appendChild(renderSentenceCard(s)));
+  sentencesData[tabId]
+    .filter(s => currentLevel === 'all' || s.level === currentLevel)
+    .forEach(s => grid.appendChild(renderSentenceCard(s)));
 }
 
 // ================== TABS ==================
@@ -219,13 +181,14 @@ function openTab(e, tabId) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
 
-  const tabElement = document.getElementById(tabId);
-  if (tabElement) tabElement.classList.add('active');
+  document.getElementById(tabId).classList.add('active');
+  e.currentTarget.classList.add('active');
 
-  if (e && e.currentTarget) e.currentTarget.classList.add('active');
-
-  if (tabId === 'favorites') renderFavorites();
-  else renderSentences(tabId);
+  if (tabId === 'favorites') {
+    renderFavorites();
+  } else {
+    renderSentences(tabId);
+  }
 }
 
 // ================== AI EXAMPLES ==================
@@ -238,68 +201,41 @@ async function loadAIExamples(card, sentence) {
   box.textContent = '⏳ يتم توليد أمثلة...';
   card.appendChild(box);
 
-  try {
-    const res = await fetch('https://baker-l14t.onrender.com/api/generate-examples', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ german: sentence.german, level: sentence.level })
-    });
+  const res = await fetch('https://baker-l14t.onrender.com/api/generate-examples', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      german: sentence.german,
+      level: sentence.level
+    })
+  });
 
-    const data = await res.json();
-    box.innerHTML = '';
+  const data = await res.json();
+  console.log('✅ AI Examples:', data);
+  box.innerHTML = '';
 
-    data.examples.forEach(ex => {
-      const row = document.createElement('div');
-      row.className = 'example-row';
-      const textSpan = document.createElement('span');
-      textSpan.textContent = ex;
-
-      const exampleSpeakBtn = document.createElement('button');
-      exampleSpeakBtn.textContent = '🔊';
-      exampleSpeakBtn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        e.preventDefault();
-        speakText(ex);
-      });
-
-      row.appendChild(textSpan);
-      row.appendChild(exampleSpeakBtn);
-      box.appendChild(row);
-    });
-  } catch (error) {
-    box.textContent = '❌ حدث خطأ في تحميل الأمثلة';
-    console.error('AI Examples Error:', error);
-  }
+  data.examples.forEach(ex => {
+    const row = document.createElement('div');
+    row.className = 'example-row';
+    // row.innerHTML = `${ex} <button>🔊</button>`;
+    row.innerHTML = `
+      <span class="german">${ex.german}</span> – 
+      <span class="arabic">${ex.arabic}</span>
+      <button>🔊</button>
+    `;
+    row.querySelector('button').onclick = e => {
+      e.stopPropagation();
+      speakText(ex, e.target);
+    };
+    box.appendChild(row);
+  });
 }
 
 // ================== INIT ==================
 function initApp() {
-  console.log('🚀 App initializing...');
-
   loadDarkMode();
   updateFavCount();
-
-  if (typeof sentencesData === 'undefined') {
-    console.error('❌ CRITICAL: sentencesData is not defined!');
-    alert('خطأ: البيانات غير موجودة. تأكد من تحميل data.js قبل app.js');
-    return;
-  }
-
-  // تحميل الأصوات
-  if (window.speechSynthesis) {
-    window.speechSynthesis.getVoices();
-    window.speechSynthesis.onvoiceschanged = () => {
-      console.log('Voices available:', window.speechSynthesis.getVoices());
-    };
-  }
-
   renderSentences('shopping');
-  console.log('✅ App initialized successfully');
 }
 
-// ================== تشغيل التطبيق ==================
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initApp);
-} else {
-  initApp();
-}
+document.addEventListener('DOMContentLoaded', initApp);
