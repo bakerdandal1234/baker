@@ -580,6 +580,12 @@ body.dark-mode .speak-btn:hover {
 body.dark-mode .speak-btn.speaking {
     background: #10b981;
 }
+@media (max-width: 800px) {
+  .speak-btn {
+    display: none !important;
+  }
+}
+
 
 
     </style>
