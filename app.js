@@ -105,25 +105,64 @@ function renderFavorites() {
 //   });
 // }
 
-function speakText(text, btn) {
-  // اختبار 1: هل الزر يشتغل أصلاً؟
-  alert('تم الضغط على الزر!');
+// function speakText(text, btn) {
+//   // اختبار 1: هل الزر يشتغل أصلاً؟
+//   alert('تم الضغط على الزر!');
   
-  // اختبار 2: هل المكتبة موجودة؟
-  if (!responsiveVoice) {
-    alert('خطأ: ResponsiveVoice غير موجود!');
-    return;
-  }
+//   // اختبار 2: هل المكتبة موجودة؟
+//   if (!responsiveVoice) {
+//     alert('خطأ: ResponsiveVoice غير موجود!');
+//     return;
+//   }
   
-  if (currentBtn) currentBtn.classList.remove('speaking');
-  currentBtn = btn;
-  btn.classList.add('speaking');
+//   if (currentBtn) currentBtn.classList.remove('speaking');
+//   currentBtn = btn;
+//   btn.classList.add('speaking');
 
-  responsiveVoice.speak(text, "Deutsch Female", {
-    rate: 0.85,
-    onend: () => btn.classList.remove('speaking'),
-    onerror: (err) => alert('خطأ في الصوت: ' + err) // اختبار 3
-  });
+//   responsiveVoice.speak(text, "Deutsch Female", {
+//     rate: 0.85,
+//     onend: () => btn.classList.remove('speaking'),
+//     onerror: (err) => alert('خطأ في الصوت: ' + err) // اختبار 3
+//   });
+// }
+
+
+function speakText(text, btn) {
+  try {
+    // رسالة اختبار
+    const testDiv = document.createElement('div');
+    testDiv.style.cssText = 'position:fixed;top:0;left:0;background:black;color:white;padding:10px;z-index:9999;';
+    testDiv.innerHTML = 'جاري التشغيل...';
+    document.body.appendChild(testDiv);
+
+    if (currentBtn) currentBtn.classList.remove('speaking');
+    currentBtn = btn;
+    btn.classList.add('speaking');
+
+    // تجربة Web Speech API
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'de-DE';
+    utterance.rate = 0.85;
+    
+    utterance.onstart = () => {
+      testDiv.innerHTML = '✅ الصوت يعمل!';
+    };
+    
+    utterance.onend = () => {
+      btn.classList.remove('speaking');
+      setTimeout(() => testDiv.remove(), 2000);
+    };
+    
+    utterance.onerror = (e) => {
+      testDiv.innerHTML = '❌ خطأ: ' + e.error;
+      btn.classList.remove('speaking');
+    };
+
+    window.speechSynthesis.speak(utterance);
+    
+  } catch(e) {
+    alert('خطأ: ' + e.message);
+  }
 }
 
 // ================== CARD ==================
