@@ -94,16 +94,42 @@ function renderFavorites() {
 }
 
 // ================== SPEECH ==================
-function speakText(text, btn) {
-  if (currentBtn) currentBtn.classList.remove('speaking');
-  currentBtn = btn;
-  btn.classList.add('speaking');
+// function speakText(text, btn) {
+//   if (currentBtn) currentBtn.classList.remove('speaking');
+//   currentBtn = btn;
+//   btn.classList.add('speaking');
 
-  responsiveVoice.speak(text, "Deutsch Female", {
-    rate: 0.85,
-    onend: () => btn.classList.remove('speaking')
-  });
+//   responsiveVoice.speak(text, "Deutsch Female", {
+//     rate: 0.85,
+//     onend: () => btn.classList.remove('speaking')
+//   });
+// }
+
+function speakText(text, btn) {
+  if (!('speechSynthesis' in window)) {
+    alert('المتصفح لا يدعم الصوت');
+    return;
+  }
+
+  speechSynthesis.cancel();
+
+  if (btn) {
+    if (currentBtn) currentBtn.classList.remove('speaking');
+    currentBtn = btn;
+    btn.classList.add('speaking');
+  }
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = 'de-DE';
+  utterance.rate = 0.85;
+
+  utterance.onend = () => {
+    if (btn) btn.classList.remove('speaking');
+  };
+
+  speechSynthesis.speak(utterance);
 }
+
 
 // ================== CARD ==================
 function renderSentenceCard(sentence) {
