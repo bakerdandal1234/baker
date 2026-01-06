@@ -278,48 +278,6 @@ function openTab(e, tabId) {
   }
 }
 
-// ================== SEARCH ==================
-function searchSentences() {
-  const query = document.getElementById('searchBox').value.trim().toLowerCase();
-  
-  if (query.length === 0) {
-    document.getElementById('searchResults').classList.remove('active');
-    const activeTab = document.querySelector('.tab-content.active:not(#searchResults)');
-    if (!activeTab) {
-      document.getElementById('shopping').classList.add('active');
-    }
-    return;
-  }
-  
-  const allTabs = document.querySelectorAll('.tab-content');
-  allTabs.forEach(tab => tab.classList.remove('active'));
-  document.getElementById('searchResults').classList.add('active');
-  
-  const tabButtons = document.querySelectorAll('.tab-button');
-  tabButtons.forEach(btn => btn.classList.remove('active'));
-  
-  const searchResultsGrid = document.getElementById('searchResultsGrid');
-  searchResultsGrid.innerHTML = '';
-  
-  let foundSentences = [];
-  
-  Object.keys(sentencesData).forEach(tabKey => {
-    sentencesData[tabKey].forEach(sentence => {
-      if (sentence.german.toLowerCase().includes(query) ||
-          sentence.arabic.toLowerCase().includes(query)) {
-        foundSentences.push(sentence);
-      }
-    });
-  });
-  
-  if (foundSentences.length > 0) {
-    foundSentences.forEach(sentence => {
-      searchResultsGrid.appendChild(renderSentenceCard(sentence));
-    });
-  } else {
-    searchResultsGrid.innerHTML = '<div style="text-align: center; padding: 40px; color: #999; font-size: 1.2em;">لم يتم العثور على نتائج</div>';
-  }
-}
 
 // ================== AI EXAMPLES ==================
 async function loadAIExamples(card, sentence) {
