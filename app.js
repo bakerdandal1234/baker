@@ -94,7 +94,6 @@ function renderFavorites() {
 }
 
 // ================== SPEECH ==================
-// ================== SPEECH ==================
 
 // تحميل الأصوات عند بدء الصفحة
 window.addEventListener('load', () => {
@@ -204,25 +203,6 @@ function webSpeech(text, btn) {
   // تشغيل الصوت
   synth.speak(utter);
 }
-
-             
-         
-
-
-
-
-
-  
-    
-    
-     
-     
-    
-      
-
-
-  
-  
 
 // ================== CARD ==================
 function renderSentenceCard(sentence) {
