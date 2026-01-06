@@ -95,7 +95,6 @@ function renderFavorites() {
 
 // ================== SPEECH ==================
 
-let currentBtn = null;
 let currentUtterance = null;
 
 // تشغيل الصوت (نقطة الدخول الوحيدة)
