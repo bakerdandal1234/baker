@@ -94,52 +94,119 @@ function renderFavorites() {
 }
 
 // ================== SPEECH ==================
+// ================== SPEECH ==================
 
+// تحميل الأصوات عند بدء الصفحة
+window.addEventListener('load', () => {
+  if (window.speechSynthesis) {
+    speechSynthesis.getVoices();
+    
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+      speechSynthesis.onvoiceschanged = () => {
+        speechSynthesis.getVoices();
+      };
+    }
+  }
+});
+
+// تفعيل الصوت عند أول تفاعل (للموبايل)
+document.addEventListener('click', function initAudio() {
+  if (window.speechSynthesis) {
+    const utterance = new SpeechSynthesisUtterance('');
+    utterance.volume = 0;
+    speechSynthesis.speak(utterance);
+  }
+  document.removeEventListener('click', initAudio);
+}, { once: true });
+
+// الدالة الرئيسية للصوت
 function speakText(text, btn) {
-            if (currentBtn) {
-                currentBtn.classList.remove('speaking');
-            }
-            btn.classList.add('speaking');
-            currentBtn = btn;
+  // إزالة التأثير من الزر السابق
+  if (currentBtn) {
+    currentBtn.classList.remove('speaking');
+  }
+  
+  // إضافة تأثير للزر الحالي
+  btn.classList.add('speaking');
+  currentBtn = btn;
 
-            try {
-                if (typeof responsiveVoice !== "undefined") {
-                    responsiveVoice.cancel();
-                    responsiveVoice.speak(text, "Deutsch Female", {
-                        rate: 0.8,
-                        onend: () => btn.classList.remove('speaking'),
-                        onerror: () => webSpeech(text, btn)
-                    });
-                    return;
-                }
-            } catch (e) {
-                console.log("ResponsiveVoice failed", e);
-            }
-
-            webSpeech(text, btn);
+  // محاولة استخدام ResponsiveVoice أولاً
+  try {
+    if (typeof responsiveVoice !== "undefined") {
+      responsiveVoice.cancel();
+      
+      responsiveVoice.speak(text, "Deutsch Female", {
+        rate: 0.8,
+        pitch: 1,
+        volume: 1,
+        
+        onend: () => {
+          btn.classList.remove('speaking');
+        },
+        
+        onerror: () => {
+          console.log("ResponsiveVoice error, switching to Web Speech API");
+          webSpeech(text, btn);
         }
+      });
+      return;
+    }
+  } catch (e) {
+    console.log("ResponsiveVoice failed:", e);
+  }
 
-        function webSpeech(text, btn) {
-            if (!window.speechSynthesis) {
-                alert("النطق غير مدعوم في هذا المتصفح");
-                btn.classList.remove('speaking');
-                return;
-            }
+  // إذا فشل ResponsiveVoice -> استخدم Web Speech API
+  webSpeech(text, btn);
+}
 
-            const synth = window.speechSynthesis;
-            synth.cancel();
+// Web Speech API (البديل)
+function webSpeech(text, btn) {
+  // تحقق من دعم المتصفح
+  if (!window.speechSynthesis) {
+    alert("النطق غير مدعوم في هذا المتصفح");
+    btn.classList.remove('speaking');
+    return;
+  }
 
-            const utter = new SpeechSynthesisUtterance(text);
-            const voices = synth.getVoices();
-            const deVoice = voices.find(v => v.lang.startsWith("de"));
-            if (deVoice) utter.voice = deVoice;
+  const synth = window.speechSynthesis;
+  
+  // إلغاء أي صوت سابق
+  synth.cancel();
 
-            utter.rate = 0.9;
-            utter.onend = () => btn.classList.remove('speaking');
-            utter.onerror = () => btn.classList.remove('speaking');
+  // إنشاء كائن النطق
+  const utter = new SpeechSynthesisUtterance(text);
+  
+  // البحث عن صوت ألماني
+  const voices = synth.getVoices();
+  const deVoice = voices.find(v => v.lang.startsWith("de"));
+  
+  if (deVoice) {
+    utter.voice = deVoice;
+  }
 
-            synth.speak(utter);
-        }
+  // إعدادات الصوت
+  utter.lang = 'de-DE';
+  utter.rate = 0.9;
+  utter.pitch = 1;
+  utter.volume = 1;
+
+  // عند انتهاء الصوت
+  utter.onend = () => {
+    btn.classList.remove('speaking');
+  };
+
+  // عند حدوث خطأ
+  utter.onerror = (e) => {
+    console.error('Speech error:', e);
+    btn.classList.remove('speaking');
+  };
+
+  // تشغيل الصوت
+  synth.speak(utter);
+}
+
+             
+         
 
 
 
