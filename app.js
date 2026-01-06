@@ -3,6 +3,31 @@ let favorites = JSON.parse(localStorage.getItem('shortSentencesFavorites')) || [
 let currentBtn = null;
 let currentLevel = 'all';
 
+// ================== VOICES / DEBUG ==================
+const DEBUG = false;
+let availableVoices = [];
+
+// تحميل الأصوات بشكل موثوق
+function loadVoices() {
+  if (!window.speechSynthesis) {
+    if (DEBUG) console.log('speechSynthesis غير مدعوم');
+    return;
+  }
+
+  const synth = window.speechSynthesis;
+  availableVoices = synth.getVoices() || [];
+
+  if (availableVoices.length === 0) {
+    // تُنادى عندما تصبح الأصوات جاهزة
+    synth.onvoiceschanged = () => {
+      availableVoices = synth.getVoices() || [];
+      if (DEBUG) console.log('voices loaded', availableVoices);
+    };
+  } else {
+    if (DEBUG) console.log('voices already available', availableVoices);
+  }
+}
+
 // ================== LEVEL FILTER ==================
 function filterByLevel(level) {
   currentLevel = level;
@@ -99,14 +124,48 @@ let currentUtterance = null;
 
 // تشغيل الصوت (نقطة الدخول الوحيدة)
 function speakText(text, btn) {
-  if (!window.speechSynthesis) return;
+  if (!window.speechSynthesis) {
+    if (DEBUG) console.warn('speechSynthesis غير مدعوم في المتصفح');
+    return;
+  }
 
   const synth = window.speechSynthesis;
 
   // إيقاف أي صوت سابق
-  synth.cancel();
+  try {
+    synth.cancel();
+  } catch (e) {
+    if (DEBUG) console.error('خطأ عند cancel():', e);
+  }
+  currentUtterance = null;
   if (typeof responsiveVoice !== "undefined") {
-    responsiveVoice.cancel();
+    try {
+      // إذا كانت responsiveVoice متاحة ومؤيدة للأصوات ستحاول استخدامها أولاً
+      if (typeof responsiveVoice.voiceSupport === 'function' ? responsiveVoice.voiceSupport() : true) {
+        responsiveVoice.cancel();
+        responsiveVoice.speak(text, "Deutsch Female", {
+          rate: 0.8,
+          onend: () => {
+            try { btn.classList.remove('speaking'); } catch(e){}
+          },
+          onerror: () => {
+            // فشل responsiveVoice -> اعادة المحاولة عبر Web Speech API
+            if (DEBUG) console.log('responsiveVoice failed, falling back to webSpeech');
+            webSpeech(text, btn);
+          }
+        });
+        // نجح الاستدعاء (أو على الأقل حاول responsiveVoice). نخرج.
+        if (DEBUG) console.log('used responsiveVoice for:', text);
+        // واجهة المستخدم
+        if (currentBtn) currentBtn.classList.remove('speaking');
+        btn.classList.add('speaking');
+        currentBtn = btn;
+        return;
+      }
+    } catch (e) {
+      if (DEBUG) console.error('responsiveVoice threw:', e);
+      // استمرار إلى webSpeech كـ fallback
+    }
   }
 
   // UI
@@ -114,26 +173,18 @@ function speakText(text, btn) {
   btn.classList.add('speaking');
   currentBtn = btn;
 
-  // محاولة ResponsiveVoice (إن كان موجودًا)
-  if (typeof responsiveVoice !== "undefined" && responsiveVoice.voiceSupport()) {
-    try {
-      responsiveVoice.speak(text, "Deutsch Female", {
-        rate: 0.8,
-        onend: () => btn.classList.remove('speaking'),
-        onerror: () => webSpeech(text, btn)
-      });
-      return; // ✔ داخل click
-    } catch (e) {
-      // fallback
-    }
-  }
-
   // fallback آمن
   webSpeech(text, btn);
 }
 
 // Web Speech API — آمن للموبايل
 function webSpeech(text, btn) {
+  if (!window.speechSynthesis) {
+    if (DEBUG) console.warn('speechSynthesis غير متاح');
+    try { btn.classList.remove('speaking'); } catch(e){}
+    return;
+  }
+
   const synth = window.speechSynthesis;
 
   const utter = new SpeechSynthesisUtterance(text);
@@ -141,44 +192,37 @@ function webSpeech(text, btn) {
   utter.rate = 0.9;
 
   // اختيار صوت ألماني إن وُجد
-  const voices = synth.getVoices();
-  const deVoice = voices.find(v => v.lang.startsWith('de'));
-  if (deVoice) utter.voice = deVoice;
+  const voices = availableVoices.length ? availableVoices : (synth.getVoices() || []);
+  const deVoice = voices.find(v => v.lang && v.lang.startsWith('de'));
+  if (deVoice) {
+    utter.voice = deVoice;
+    if (DEBUG) console.log('selected german voice:', deVoice.name, deVoice.lang);
+  } else {
+    if (DEBUG) console.log('no german voice found, using default voice');
+  }
 
   utter.onend = () => {
-    btn.classList.remove('speaking');
+    try { btn.classList.remove('speaking'); } catch(e){}
     currentUtterance = null;
   };
 
-  utter.onerror = () => {
-    btn.classList.remove('speaking');
+  utter.onerror = (e) => {
+    console.error('speech utter error:', e);
+    try { btn.classList.remove('speaking'); } catch(e){}
     currentUtterance = null;
   };
 
   currentUtterance = utter;
 
-  // ⚠️ مهم: speak مباشرة بدون أي async
-  synth.speak(utter);
+  try {
+    // قد ترفض المتصفحات speak() في حالات نادرة — لذا نستخدم try/catch
+    synth.speak(utter);
+  } catch (err) {
+    console.error('speak() threw:', err);
+    try { btn.classList.remove('speaking'); } catch(e){}
+    currentUtterance = null;
+  }
 }
-
-    
-   
-
-
-
-    
-     
-   
-
-
-
-
-        
-       
-
-
-
-  
 
 // ================== CARD ==================
 function renderSentenceCard(sentence) {
@@ -276,28 +320,37 @@ async function loadAIExamples(card, sentence) {
   box.textContent = '⏳ يتم توليد أمثلة...';
   card.appendChild(box);
 
-  const res = await fetch('https://baker-l14t.onrender.com/api/generate-examples', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      german: sentence.german,
-      level: sentence.level
-    })
-  });
+  try {
+    const res = await fetch('https://baker-l14t.onrender.com/api/generate-examples', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        german: sentence.german,
+        level: sentence.level
+      })
+    });
 
-  const data = await res.json();
-  box.innerHTML = '';
+    if (!res.ok) {
+      throw new Error('API responded with ' + res.status);
+    }
 
-  data.examples.forEach(ex => {
-    const row = document.createElement('div');
-    row.className = 'example-row';
-    row.innerHTML = `${ex} <button>🔊</button>`;
-    row.querySelector('button').onclick = e => {
-      e.stopPropagation();
-      speakText(ex, e.target);
-    };
-    box.appendChild(row);
-  });
+    const data = await res.json();
+    box.innerHTML = '';
+
+    (data.examples || []).forEach(ex => {
+      const row = document.createElement('div');
+      row.className = 'example-row';
+      row.innerHTML = `${ex} <button>🔊</button>`;
+      row.querySelector('button').onclick = e => {
+        e.stopPropagation();
+        speakText(ex, e.target);
+      };
+      box.appendChild(row);
+    });
+  } catch (err) {
+    console.error('Failed to load AI examples:', err);
+    box.textContent = 'خطأ في توليد الأمثلة';
+  }
 }
 
 // ================== INIT ==================
@@ -305,6 +358,11 @@ function initApp() {
   loadDarkMode();
   updateFavCount();
   renderSentences('shopping');
+  loadVoices(); // تحميل الأصوات عند بدء التطبيق
+  if (DEBUG) {
+    console.log('initApp done. speechSynthesis supported?', !!window.speechSynthesis);
+    console.log('initial voices:', window.speechSynthesis ? window.speechSynthesis.getVoices() : []);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
