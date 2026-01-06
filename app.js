@@ -469,7 +469,7 @@ async function loadAIExamples(card, sentence) {
   card.appendChild(box);
 
   try {
-    const res = await fetch('/api/generate-examples', {
+    const res = await fetch('https://baker-l14t.onrender.com/api/generate-examples', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
