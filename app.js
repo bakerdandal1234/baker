@@ -143,7 +143,7 @@ function renderSentenceCard(sentence) {
 
   const aiBtn = document.createElement('button');
   aiBtn.className = 'ai-btn';
-  aiBtn.textContent = '🧠 AI ';
+  aiBtn.textContent = '🧠 أمثلة ذكية ';
   aiBtn.onclick = e => {
     e.stopPropagation();
     loadAIExamples(card, sentence);
@@ -198,7 +198,7 @@ async function loadAIExamples(card, sentence) {
 
   box = document.createElement('div');
   box.className = 'ai-examples';
-  box.textContent = '⏳ يتم توليد أمثلة...';
+  box.textContent = '🤖 الذكاء الاصطناعي يفكّر...';
   card.appendChild(box);
 
   const res = await fetch('https://baker-l14t.onrender.com/api/generate-examples', {
