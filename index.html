@@ -24,6 +24,26 @@
 
         <input type="text" id="searchBox" class="search-box" placeholder="ابحث عن جملة..." oninput="searchSentences()">
 
+        <div class="level-filter">
+            <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
+                <button class="level-filter-btn active" onclick="filterByLevel('all')">
+                    الكل
+                </button>
+                <button class="level-filter-btn level-A1" onclick="filterByLevel('A1')">
+                    A1 - مبتدئ
+                </button>
+                <button class="level-filter-btn level-A2" onclick="filterByLevel('A2')">
+                    A2 - ابتدائي
+                </button>
+                <button class="level-filter-btn level-B1" onclick="filterByLevel('B1')">
+                    B1 - متوسط
+                </button>
+                <button class="level-filter-btn level-B2" onclick="filterByLevel('B2')">
+                    B2 - متوسط متقدم
+                </button>
+            </div>
+        </div>
+
         <div class="tabs">
             <button class="tab-button" onclick="openTab(event, 'favorites')">⭐ مفضلة (<span id="favCount">0</span>)</button>
             <button class="tab-button active" onclick="openTab(event, 'shopping')">🏪 تسوق</button>
