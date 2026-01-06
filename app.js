@@ -3,40 +3,54 @@ let favorites = JSON.parse(localStorage.getItem('shortSentencesFavorites')) || [
 let currentBtn = null;
 let currentLevel = 'all';
 
-// ================== DEBUG / ALERTS ==================
-// اجعل true لعرض رسائل التصحيح عبر alert (مفيد للهاتف)
-// اجعل false للعودة إلى console (مفيد لتصحيح متقدم)
-const USE_ALERTS = true;
+// ================== DEBUG / VISUAL LOG ==================
+const USE_ALERTS = false; // ضع true إذا تريد رسائل alert أيضاً
+let debugPanel = null;
 
-function formatError(e) {
-  try {
-    if (!e) return String(e);
-    if (e instanceof Error) return e.message + (e.stack ? "\n" + e.stack : "");
-    return typeof e === 'object' ? JSON.stringify(e, null, 2) : String(e);
-  } catch (err) {
-    return String(e);
-  }
+function ensureDebugPanel() {
+  if (debugPanel) return;
+  debugPanel = document.createElement('div');
+  debugPanel.id = 'debugPanel';
+  Object.assign(debugPanel.style, {
+    position: 'fixed',
+    right: '10px',
+    bottom: '10px',
+    width: '320px',
+    maxHeight: '45vh',
+    overflow: 'auto',
+    background: 'rgba(0,0,0,0.8)',
+    color: '#fff',
+    padding: '8px',
+    fontSize: '12px',
+    zIndex: 99999,
+    borderRadius: '6px',
+    boxShadow: '0 2px 10px rgba(0,0,0,0.5)'
+  });
+  document.body.appendChild(debugPanel);
 }
 
 function debug(msg, level = 'log') {
-  const text = typeof msg === 'object' ? (msg && msg.message ? formatError(msg) : JSON.stringify(msg, null, 2)) : String(msg);
-  if (USE_ALERTS) {
-    try {
-      alert(level.toUpperCase() + ': ' + text);
-    } catch (err) {
-      // لا شيء إذا فشل alert
-    }
-  } else if (window.console && typeof window.console[level] === 'function') {
-    window.console[level](msg);
-  } else if (window.console && typeof window.console.log === 'function') {
-    window.console.log(msg);
+  try {
+    ensureDebugPanel();
+    const time = new Date().toLocaleTimeString();
+    let text = '';
+    if (typeof msg === 'string') text = msg;
+    else if (msg instanceof Error) text = msg.message + (msg.stack ? '\n' + msg.stack : '');
+    else text = JSON.stringify(msg, null, 2);
+    const line = document.createElement('div');
+    line.style.marginBottom = '6px';
+    line.innerText = `[${time}] ${level.toUpperCase()}: ${text}`;
+    debugPanel.appendChild(line);
+    debugPanel.scrollTop = debugPanel.scrollHeight;
+    if (USE_ALERTS) alert(level.toUpperCase() + ': ' + text);
+  } catch (e) {
+    try { if (USE_ALERTS) alert('DEBUG FAILED: ' + String(e)); } catch(_) {}
   }
 }
 
 // ================== VOICES / DEBUG ==================
 let availableVoices = [];
 
-// تحميل الأصوات بشكل موثوق
 function loadVoices() {
   if (!window.speechSynthesis) {
     debug('speechSynthesis غير مدعوم', 'warn');
@@ -47,25 +61,23 @@ function loadVoices() {
   availableVoices = synth.getVoices() || [];
 
   if (availableVoices.length === 0) {
-    // تُنادى عندما تصبح الأصوات جاهزة
+    debug('لا توجد أصوات حالياً - تسجيل onvoiceschanged', 'log');
     synth.onvoiceschanged = () => {
       try {
         availableVoices = synth.getVoices() || [];
-        debug({ msg: 'voices loaded', voices: availableVoices }, 'log');
+        debug({ msg: 'voices loaded', voices: availableVoices.map(v => v.name + '|' + v.lang) }, 'log');
       } catch (e) {
-        debug(e, 'error');
+        debug({ msg: 'onvoiceschanged error', err: e }, 'error');
       }
     };
-    debug('لا توجد أصوات حتى الآن - سيتم انتظار onvoiceschanged', 'log');
   } else {
-    debug({ msg: 'voices already available', voices: availableVoices }, 'log');
+    debug({ msg: 'voices available initially', voices: availableVoices.map(v => v.name + '|' + v.lang) }, 'log');
   }
 }
 
 // ================== LEVEL FILTER ==================
 function filterByLevel(level) {
   currentLevel = level;
-
   document.querySelectorAll('.level-filter-btn').forEach(btn => {
     btn.classList.remove('active');
     if (
@@ -91,33 +103,32 @@ function toggleDarkMode() {
   document.body.classList.toggle('dark-mode');
   const isDark = document.body.classList.contains('dark-mode');
   localStorage.setItem('darkMode', isDark);
-  document.getElementById('darkModeToggle').textContent = isDark ? '☀️' : '🌙';
+  const dm = document.getElementById('darkModeToggle');
+  if (dm) dm.textContent = isDark ? '☀️' : '🌙';
 }
 
 function loadDarkMode() {
   if (localStorage.getItem('darkMode') === 'true') {
     document.body.classList.add('dark-mode');
-    document.getElementById('darkModeToggle').textContent = '☀️';
+    const dm = document.getElementById('darkModeToggle');
+    if (dm) dm.textContent = '☀️';
   }
 }
 
 // ================== FAVORITES ==================
 function updateFavCount() {
-  document.getElementById('favCount').textContent = favorites.length;
+  const el = document.getElementById('favCount');
+  if (el) el.textContent = favorites.length;
 }
 
 function toggleFavorite(sentence, e) {
   e.stopPropagation();
-
   const index = favorites.findIndex(
     f => f.german === sentence.german && f.arabic === sentence.arabic
   );
 
-  if (index > -1) {
-    favorites.splice(index, 1);
-  } else {
-    favorites.push(sentence);
-  }
+  if (index > -1) favorites.splice(index, 1);
+  else favorites.push(sentence);
 
   localStorage.setItem('shortSentencesFavorites', JSON.stringify(favorites));
   updateFavCount();
@@ -133,63 +144,54 @@ function isFavorite(sentence) {
 function renderFavorites() {
   const grid = document.getElementById('favoritesGrid');
   const noFav = document.getElementById('noFavorites');
-
+  if (!grid) return;
   grid.innerHTML = '';
 
-  const filtered = favorites.filter(
-    s => currentLevel === 'all' || s.level === currentLevel
-  );
-
+  const filtered = favorites.filter(s => currentLevel === 'all' || s.level === currentLevel);
   if (filtered.length === 0) {
-    noFav.style.display = 'block';
+    if (noFav) noFav.style.display = 'block';
     grid.style.display = 'none';
     return;
   }
-
-  noFav.style.display = 'none';
+  if (noFav) noFav.style.display = 'none';
   grid.style.display = 'grid';
-
   filtered.forEach(s => grid.appendChild(renderSentenceCard(s)));
 }
 
 // ================== SPEECH ==================
-
 let currentUtterance = null;
 
-// تشغيل الصوت (نقطة الدخول الوحيدة)
 function speakText(text, btn) {
   if (!window.speechSynthesis) {
     debug('speechSynthesis غير مدعوم في المتصفح', 'warn');
-    try { btn.classList.remove('speaking'); } catch(e){}
+    try { if (btn) btn.classList.remove('speaking'); } catch(_) {}
     return;
   }
 
   const synth = window.speechSynthesis;
 
-  // إيقاف أي صوت سابق
   try {
     synth.cancel();
   } catch (e) {
-    debug({ msg: 'خطأ عند cancel()', err: e }, 'error');
+    debug({ msg: 'cancel() threw', err: e }, 'error');
   }
   currentUtterance = null;
+
   if (typeof responsiveVoice !== "undefined") {
     try {
       if (typeof responsiveVoice.voiceSupport === 'function' ? responsiveVoice.voiceSupport() : true) {
         responsiveVoice.cancel();
         responsiveVoice.speak(text, "Deutsch Female", {
           rate: 0.8,
-          onend: () => {
-            try { btn.classList.remove('speaking'); } catch(e){}
-          },
+          onend: () => { try { if (btn) btn.classList.remove('speaking'); } catch(_) {} },
           onerror: () => {
-            debug('responsiveVoice onerror - falling back to webSpeech', 'warn');
+            debug('responsiveVoice error -> fallback webSpeech', 'warn');
             webSpeech(text, btn);
           }
         });
         debug('used responsiveVoice for: ' + text, 'log');
         if (currentBtn) currentBtn.classList.remove('speaking');
-        btn.classList.add('speaking');
+        if (btn) btn.classList.add('speaking');
         currentBtn = btn;
         return;
       }
@@ -198,47 +200,43 @@ function speakText(text, btn) {
     }
   }
 
-  // UI
-  if (currentBtn) currentBtn.classList.remove('speaking');
-  btn.classList.add('speaking');
+  if (currentBtn) try { currentBtn.classList.remove('speaking'); } catch(_) {}
+  if (btn) try { btn.classList.add('speaking'); } catch(_) {}
   currentBtn = btn;
 
-  // fallback آمن
   webSpeech(text, btn);
 }
 
-// Web Speech API — آمن للموبايل
 function webSpeech(text, btn) {
   if (!window.speechSynthesis) {
-    debug('speechSynthesis غير متاح', 'warn');
-    try { btn.classList.remove('speaking'); } catch(e){}
+    debug('speechSynthesis unavailable', 'warn');
+    try { if (btn) btn.classList.remove('speaking'); } catch(_) {}
     return;
   }
 
   const synth = window.speechSynthesis;
-
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = 'de-DE';
   utter.rate = 0.9;
 
-  // اختيار صوت ألماني إن وُجد
   const voices = availableVoices.length ? availableVoices : (synth.getVoices() || []);
   const deVoice = voices.find(v => v.lang && v.lang.startsWith('de'));
   if (deVoice) {
     utter.voice = deVoice;
     debug('selected german voice: ' + (deVoice.name || deVoice.lang), 'log');
   } else {
-    debug('no german voice found, using default voice', 'log');
+    debug('no german voice found, using default', 'log');
   }
 
   utter.onend = () => {
-    try { btn.classList.remove('speaking'); } catch(e){}
+    try { if (btn) btn.classList.remove('speaking'); } catch(_) {}
     currentUtterance = null;
+    debug('utter.onend', 'log');
   };
 
   utter.onerror = (e) => {
-    debug({ msg: 'speech utter error', err: e }, 'error');
-    try { btn.classList.remove('speaking'); } catch(e){}
+    debug({ msg: 'utter.onerror', err: e }, 'error');
+    try { if (btn) btn.classList.remove('speaking'); } catch(_) {}
     currentUtterance = null;
   };
 
@@ -246,9 +244,10 @@ function webSpeech(text, btn) {
 
   try {
     synth.speak(utter);
+    debug('synth.speak called for: ' + text, 'log');
   } catch (err) {
-    debug({ msg: 'speak() threw', err: err }, 'error');
-    try { btn.classList.remove('speaking'); } catch(e){}
+    debug({ msg: 'synth.speak threw', err: err }, 'error');
+    try { if (btn) btn.classList.remove('speaking'); } catch(_) {}
     currentUtterance = null;
   }
 }
@@ -297,28 +296,16 @@ function renderSentenceCard(sentence) {
     loadAIExamples(card, sentence);
   };
 
-  card.append(
-    favBtn,
-    speakBtn,
-    level,
-    german,
-    arabic,
-    aiBtn,
-    usage
-  );
-
+  card.append(favBtn, speakBtn, level, german, arabic, aiBtn, usage);
   card.onclick = () => speakText(sentence.german, speakBtn);
-
   return card;
 }
 
 // ================== RENDER TABS ==================
 function renderSentences(tabId) {
   const grid = document.querySelector(`#${tabId} .sentences-grid`);
-  if (!grid || !sentencesData[tabId]) return;
-
+  if (!grid || !sentencesData || !sentencesData[tabId]) return;
   grid.innerHTML = '';
-
   sentencesData[tabId]
     .filter(s => currentLevel === 'all' || s.level === currentLevel)
     .forEach(s => grid.appendChild(renderSentenceCard(s)));
@@ -328,22 +315,17 @@ function renderSentences(tabId) {
 function openTab(e, tabId) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-
-  document.getElementById(tabId).classList.add('active');
-  e.currentTarget.classList.add('active');
-
-  if (tabId === 'favorites') {
-    renderFavorites();
-  } else {
-    renderSentences(tabId);
-  }
+  const tabEl = document.getElementById(tabId);
+  if (tabEl) tabEl.classList.add('active');
+  if (e && e.currentTarget) e.currentTarget.classList.add('active');
+  if (tabId === 'favorites') renderFavorites();
+  else renderSentences(tabId);
 }
 
 // ================== AI EXAMPLES ==================
 async function loadAIExamples(card, sentence) {
   let box = card.querySelector('.ai-examples');
   if (box) return box.remove();
-
   box = document.createElement('div');
   box.className = 'ai-examples';
   box.textContent = '⏳ يتم توليد أمثلة...';
@@ -353,19 +335,11 @@ async function loadAIExamples(card, sentence) {
     const res = await fetch('https://baker-l14t.onrender.com/api/generate-examples', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        german: sentence.german,
-        level: sentence.level
-      })
+      body: JSON.stringify({ german: sentence.german, level: sentence.level })
     });
-
-    if (!res.ok) {
-      throw new Error('API responded with ' + res.status);
-    }
-
+    if (!res.ok) throw new Error('API ' + res.status);
     const data = await res.json();
     box.innerHTML = '';
-
     (data.examples || []).forEach(ex => {
       const row = document.createElement('div');
       row.className = 'example-row';
@@ -382,14 +356,43 @@ async function loadAIExamples(card, sentence) {
   }
 }
 
+// ================== TEST UI ==================
+function createTestUI() {
+  try {
+    const container = document.createElement('div');
+    container.id = 'testControls';
+    Object.assign(container.style, {
+      position: 'fixed', left: '10px', bottom: '10px', zIndex: 99998
+    });
+
+    const testBtn = document.createElement('button');
+    testBtn.textContent = 'اختبر الصوت';
+    Object.assign(testBtn.style, { padding: '8px 12px', fontSize: '14px' });
+
+    testBtn.onclick = () => {
+      debug('Test button clicked - will try speak "Guten Tag"', 'log');
+      // نستخدم زر وهمي ليُمرّر إلى speakText حتى تُرى حالة الـ UI
+      const fakeBtn = document.createElement('button');
+      fakeBtn.className = 'speak-btn';
+      speakText('Guten Tag', fakeBtn);
+    };
+
+    container.appendChild(testBtn);
+    document.body.appendChild(container);
+  } catch (e) {
+    debug({ msg: 'createTestUI threw', err: e }, 'error');
+  }
+}
+
 // ================== INIT ==================
 function initApp() {
   loadDarkMode();
   updateFavCount();
-  renderSentences('shopping');
-  loadVoices(); // تحميل الأصوات عند بدء التطبيق
+  try { renderSentences('shopping'); } catch(e) { debug({ msg: 'renderSentences error', err: e }, 'error'); }
+  loadVoices();
+  createTestUI();
   debug({ msg: 'initApp done', speechSynthesisSupported: !!window.speechSynthesis }, 'log');
-  debug({ msg: 'initial voices', voices: window.speechSynthesis ? window.speechSynthesis.getVoices() : [] }, 'log');
+  debug({ msg: 'initial voices', voices: window.speechSynthesis ? window.speechSynthesis.getVoices().map(v => v.name + '|' + v.lang) : [] }, 'log');
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
