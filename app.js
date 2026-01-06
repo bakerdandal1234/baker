@@ -274,6 +274,25 @@ async function loadAIExamples(card, sentence) {
   });
 }
 
+
+
+function initAudio() {
+  if (!('speechSynthesis' in window)) {
+    alert('المتصفح لا يدعم الصوت');
+    return;
+  }
+
+  const u = new SpeechSynthesisUtterance('Hallo');
+  u.lang = 'de-DE';
+  u.volume = 0;
+  speechSynthesis.speak(u);
+
+  const btn = document.getElementById('enableAudioBtn');
+  if (btn) btn.style.display = 'none';
+}
+
+
+
 // ================== INIT ==================
 function initApp() {
   loadDarkMode();
