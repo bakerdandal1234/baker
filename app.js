@@ -479,7 +479,7 @@ async function loadAIExamples(card, sentence) {
 
   try {
     // الاتصال بالخادم الخلفي الخاص بك
-    const response = await fetch("https://baker-l14t.onrender.com/generate-examples", {
+    const response = await fetch("https://baker-l14t.onrender.com/api/generate-examples", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
