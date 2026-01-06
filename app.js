@@ -126,45 +126,107 @@ function renderFavorites() {
 //   });
 // }
 
+let currentBtn = null;
+let isSpeaking = false;
 
 function speakText(text, btn) {
-  try {
-    // رسالة اختبار
-    const testDiv = document.createElement('div');
-    testDiv.style.cssText = 'position:fixed;top:0;left:0;background:black;color:white;padding:10px;z-index:9999;';
-    testDiv.innerHTML = 'جاري التشغيل...';
-    document.body.appendChild(testDiv);
+  // منع الضغط المتعدد
+  if (isSpeaking) {
+    speechSynthesis.cancel();
+    return;
+  }
 
-    if (currentBtn) currentBtn.classList.remove('speaking');
-    currentBtn = btn;
-    btn.classList.add('speaking');
+  const testDiv = document.createElement('div');
+  testDiv.style.cssText = 'position:fixed;top:10px;left:10px;right:10px;background:rgba(0,0,0,0.9);color:white;padding:15px;z-index:9999;font-size:14px;border-radius:8px;';
+  testDiv.innerHTML = '⏳ تحضير الصوت...';
+  document.body.appendChild(testDiv);
 
-    // تجربة Web Speech API
+  if (currentBtn) currentBtn.classList.remove('speaking');
+  currentBtn = btn;
+  btn.classList.add('speaking');
+
+  // إلغاء أي صوت سابق تماماً
+  speechSynthesis.cancel();
+  
+  // انتظار أطول قبل التشغيل
+  setTimeout(() => {
+    isSpeaking = true;
+    
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'de-DE';
     utterance.rate = 0.85;
+    utterance.pitch = 1;
+    utterance.volume = 1;
+    
+    // مهم جداً: تعيين الصوت بشكل صحيح
+    const voices = speechSynthesis.getVoices();
+    const germanVoice = voices.find(v => v.lang.includes('de'));
+    if (germanVoice) {
+      utterance.voice = germanVoice;
+    }
     
     utterance.onstart = () => {
-      testDiv.innerHTML = '✅ الصوت يعمل!';
+      testDiv.innerHTML = '🔊 الصوت يعمل!';
+      isSpeaking = true;
     };
     
     utterance.onend = () => {
+      testDiv.innerHTML = '✅ انتهى الصوت';
       btn.classList.remove('speaking');
-      setTimeout(() => testDiv.remove(), 2000);
+      isSpeaking = false;
+      setTimeout(() => testDiv.remove(), 1500);
     };
     
     utterance.onerror = (e) => {
       testDiv.innerHTML = '❌ خطأ: ' + e.error;
       btn.classList.remove('speaking');
+      isSpeaking = false;
+      
+      // إعادة المحاولة تلقائياً
+      if (e.error === 'interrupted') {
+        testDiv.innerHTML += '<br>🔄 إعادة المحاولة...';
+        setTimeout(() => {
+          speechSynthesis.cancel();
+          speechSynthesis.speak(utterance);
+        }, 300);
+      }
     };
 
-    window.speechSynthesis.speak(utterance);
+    // التشغيل
+    speechSynthesis.speak(utterance);
     
-  } catch(e) {
-    alert('خطأ: ' + e.message);
-  }
+    // حل Chrome Mobile: إبقاء الصوت نشطاً
+    const keepAlive = setInterval(() => {
+      if (!isSpeaking) {
+        clearInterval(keepAlive);
+      } else {
+        speechSynthesis.pause();
+        speechSynthesis.resume();
+      }
+    }, 5000);
+    
+  }, 250); // انتظار 250ms مهم جداً!
 }
 
+// تحميل الأصوات مسبقاً عند فتح الصفحة
+window.addEventListener('load', () => {
+  speechSynthesis.getVoices();
+  
+  // تفعيل الصوت عند أول ضغطة في أي مكان
+  document.addEventListener('click', function initAudio() {
+    const utterance = new SpeechSynthesisUtterance('');
+    utterance.volume = 0;
+    speechSynthesis.speak(utterance);
+    document.removeEventListener('click', initAudio);
+  }, { once: true });
+});
+
+// مهم: إعادة تحميل الأصوات
+if (speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = () => {
+    speechSynthesis.getVoices();
+  };
+}
 // ================== CARD ==================
 function renderSentenceCard(sentence) {
   const card = document.createElement('div');
