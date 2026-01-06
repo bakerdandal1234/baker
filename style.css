@@ -523,6 +523,63 @@ body.dark-mode .level-filter-btn.active {
     font-size: 0.85em;
   }
 }
+/* ================== SPEAK BUTTON ================== */
+.speak-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    font-size: 1.3em;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.speak-btn:hover {
+    background: #5568d3;
+    transform: scale(1.1);
+}
+
+.speak-btn:active {
+    transform: scale(0.95);
+}
+
+.speak-btn.speaking {
+    background: #10b981;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        transform: scale(1); 
+    }
+    50% { 
+        transform: scale(1.15); 
+    }
+}
+
+/* Dark Mode للزر */
+body.dark-mode .speak-btn {
+    background: #1a1a2e;
+    color: #7dd3fc;
+}
+
+body.dark-mode .speak-btn:hover {
+    background: #7dd3fc;
+    color: #1a1a2e;
+}
+
+body.dark-mode .speak-btn.speaking {
+    background: #10b981;
+}
 
 
     </style>
