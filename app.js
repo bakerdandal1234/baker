@@ -95,193 +95,82 @@ function renderFavorites() {
 
 // ================== SPEECH ==================
 
-// تحميل الأصوات عند بدء الصفحة
-// ================== SPEECH ==================
+let currentBtn = null;
+let currentUtterance = null;
 
-let audioContext = null;
-let isSpeaking = false;
-
-// تفعيل AudioContext للموبايل
-function unlockAudio() {
-  if (!audioContext) {
-    try {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const buffer = audioContext.createBuffer(1, 1, 22050);
-      const source = audioContext.createBufferSource();
-      source.buffer = buffer;
-      source.connect(audioContext.destination);
-      source.start(0);
-    } catch (e) {
-      console.log('AudioContext failed:', e);
-    }
-  }
-}
-
-// تحميل الأصوات عند بدء الصفحة
-window.addEventListener('load', () => {
-  if (window.speechSynthesis) {
-    speechSynthesis.getVoices();
-    
-    if (speechSynthesis.onvoiceschanged !== undefined) {
-      speechSynthesis.onvoiceschanged = () => {
-        speechSynthesis.getVoices();
-      };
-    }
-  }
-});
-
-// تفعيل الصوت عند أول ضغطة
-let audioInitialized = false;
-document.addEventListener('click', function initAudio() {
-  if (!audioInitialized) {
-    unlockAudio();
-    
-    if (window.speechSynthesis) {
-      const utterance = new SpeechSynthesisUtterance('');
-      utterance.volume = 0;
-      speechSynthesis.speak(utterance);
-    }
-    
-    audioInitialized = true;
-  }
-}, { once: true });
-
-// الدالة الرئيسية للصوت
+// تشغيل الصوت (نقطة الدخول الوحيدة)
 function speakText(text, btn) {
-  // منع الضغط المتعدد
-  if (isSpeaking) {
-    if (window.speechSynthesis) {
-      speechSynthesis.cancel();
-    }
-    if (typeof responsiveVoice !== "undefined") {
-      responsiveVoice.cancel();
-    }
-    if (currentBtn) {
-      currentBtn.classList.remove('speaking');
-    }
-    isSpeaking = false;
-    return;
+  if (!window.speechSynthesis) return;
+
+  const synth = window.speechSynthesis;
+
+  // إيقاف أي صوت سابق
+  synth.cancel();
+  if (typeof responsiveVoice !== "undefined") {
+    responsiveVoice.cancel();
   }
 
-  // تفعيل الصوت
-  unlockAudio();
-
-  // إزالة التأثير من الزر السابق
-  if (currentBtn) {
-    currentBtn.classList.remove('speaking');
-  }
-  
-  // إضافة تأثير للزر الحالي
+  // UI
+  if (currentBtn) currentBtn.classList.remove('speaking');
   btn.classList.add('speaking');
   currentBtn = btn;
-  isSpeaking = true;
 
-  // محاولة ResponsiveVoice أولاً
-  try {
-    if (typeof responsiveVoice !== "undefined" && responsiveVoice.voiceSupport()) {
-      responsiveVoice.cancel();
-      
+  // محاولة ResponsiveVoice (إن كان موجودًا)
+  if (typeof responsiveVoice !== "undefined" && responsiveVoice.voiceSupport()) {
+    try {
       responsiveVoice.speak(text, "Deutsch Female", {
         rate: 0.8,
-        pitch: 1,
-        volume: 1,
-        
-        onstart: () => {
-          console.log('ResponsiveVoice started');
-          isSpeaking = true;
-        },
-        
-        onend: () => {
-          console.log('ResponsiveVoice ended');
-          btn.classList.remove('speaking');
-          isSpeaking = false;
-        },
-        
-        onerror: (err) => {
-          console.log('ResponsiveVoice error:', err);
-          isSpeaking = false;
-          webSpeech(text, btn);
-        }
+        onend: () => btn.classList.remove('speaking'),
+        onerror: () => webSpeech(text, btn)
       });
-      return;
+      return; // ✔ داخل click
+    } catch (e) {
+      // fallback
     }
-  } catch (e) {
-    console.log("ResponsiveVoice failed:", e);
   }
 
-  // البديل: Web Speech API
+  // fallback آمن
   webSpeech(text, btn);
 }
 
-// Web Speech API (البديل)
+// Web Speech API — آمن للموبايل
 function webSpeech(text, btn) {
-  if (!window.speechSynthesis) {
-    alert("الصوت غير مدعوم في هذا المتصفح");
-    btn.classList.remove('speaking');
-    isSpeaking = false;
-    return;
-  }
-
   const synth = window.speechSynthesis;
-  synth.cancel();
 
-  // انتظار قصير قبل التشغيل (مهم للموبايل)
-  setTimeout(() => {
-    const utter = new SpeechSynthesisUtterance(text);
-    
-    // البحث عن صوت ألماني
-    const voices = synth.getVoices();
-    const deVoice = voices.find(v => v.lang.includes('de'));
-    
-    if (deVoice) {
-      utter.voice = deVoice;
-    }
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = 'de-DE';
+  utter.rate = 0.9;
 
-    utter.lang = 'de-DE';
-    utter.rate = 0.9;
-    utter.pitch = 1;
-    utter.volume = 1;
+  // اختيار صوت ألماني إن وُجد
+  const voices = synth.getVoices();
+  const deVoice = voices.find(v => v.lang.startsWith('de'));
+  if (deVoice) utter.voice = deVoice;
 
-    utter.onstart = () => {
-      console.log('Web Speech started');
-      isSpeaking = true;
-    };
+  utter.onend = () => {
+    btn.classList.remove('speaking');
+    currentUtterance = null;
+  };
 
-    utter.onend = () => {
-      console.log('Web Speech ended');
-      btn.classList.remove('speaking');
-      isSpeaking = false;
-    };
+  utter.onerror = () => {
+    btn.classList.remove('speaking');
+    currentUtterance = null;
+  };
 
-    utter.onerror = (e) => {
-      console.error('Web Speech error:', e);
-      btn.classList.remove('speaking');
-      isSpeaking = false;
-      
-      // إعادة المحاولة في حالة "interrupted"
-      if (e.error === 'interrupted') {
-        setTimeout(() => {
-          synth.cancel();
-          synth.speak(utter);
-        }, 100);
-      }
-    };
+  currentUtterance = utter;
 
-    // تشغيل الصوت
-    synth.speak(utter);
-
-    // Keep-alive للموبايل (يمنع توقف الصوت)
-    const keepAlive = setInterval(() => {
-      if (!isSpeaking) {
-        clearInterval(keepAlive);
-      } else {
-        synth.pause();
-        synth.resume();
-      }
-    }, 8000);
-
-  }, 100);
+  // ⚠️ مهم: speak مباشرة بدون أي async
+  synth.speak(utter);
 }
+
+    
+   
+
+
+
+    
+     
+   
+
 
 
 
