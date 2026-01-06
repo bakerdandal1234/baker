@@ -3,14 +3,43 @@ let favorites = JSON.parse(localStorage.getItem('shortSentencesFavorites')) || [
 let currentBtn = null;
 let currentLevel = 'all';
 
+// ================== DEBUG / ALERTS ==================
+// اجعل true لعرض رسائل التصحيح عبر alert (مفيد للهاتف)
+// اجعل false للعودة إلى console (مفيد لتصحيح متقدم)
+const USE_ALERTS = true;
+
+function formatError(e) {
+  try {
+    if (!e) return String(e);
+    if (e instanceof Error) return e.message + (e.stack ? "\n" + e.stack : "");
+    return typeof e === 'object' ? JSON.stringify(e, null, 2) : String(e);
+  } catch (err) {
+    return String(e);
+  }
+}
+
+function debug(msg, level = 'log') {
+  const text = typeof msg === 'object' ? (msg && msg.message ? formatError(msg) : JSON.stringify(msg, null, 2)) : String(msg);
+  if (USE_ALERTS) {
+    try {
+      alert(level.toUpperCase() + ': ' + text);
+    } catch (err) {
+      // لا شيء إذا فشل alert
+    }
+  } else if (window.console && typeof window.console[level] === 'function') {
+    window.console[level](msg);
+  } else if (window.console && typeof window.console.log === 'function') {
+    window.console.log(msg);
+  }
+}
+
 // ================== VOICES / DEBUG ==================
-const DEBUG = false;
 let availableVoices = [];
 
 // تحميل الأصوات بشكل موثوق
 function loadVoices() {
   if (!window.speechSynthesis) {
-    if (DEBUG) console.log('speechSynthesis غير مدعوم');
+    debug('speechSynthesis غير مدعوم', 'warn');
     return;
   }
 
@@ -20,11 +49,16 @@ function loadVoices() {
   if (availableVoices.length === 0) {
     // تُنادى عندما تصبح الأصوات جاهزة
     synth.onvoiceschanged = () => {
-      availableVoices = synth.getVoices() || [];
-      if (DEBUG) console.log('voices loaded', availableVoices);
+      try {
+        availableVoices = synth.getVoices() || [];
+        debug({ msg: 'voices loaded', voices: availableVoices }, 'log');
+      } catch (e) {
+        debug(e, 'error');
+      }
     };
+    debug('لا توجد أصوات حتى الآن - سيتم انتظار onvoiceschanged', 'log');
   } else {
-    if (DEBUG) console.log('voices already available', availableVoices);
+    debug({ msg: 'voices already available', voices: availableVoices }, 'log');
   }
 }
 
@@ -125,7 +159,8 @@ let currentUtterance = null;
 // تشغيل الصوت (نقطة الدخول الوحيدة)
 function speakText(text, btn) {
   if (!window.speechSynthesis) {
-    if (DEBUG) console.warn('speechSynthesis غير مدعوم في المتصفح');
+    debug('speechSynthesis غير مدعوم في المتصفح', 'warn');
+    try { btn.classList.remove('speaking'); } catch(e){}
     return;
   }
 
@@ -135,12 +170,11 @@ function speakText(text, btn) {
   try {
     synth.cancel();
   } catch (e) {
-    if (DEBUG) console.error('خطأ عند cancel():', e);
+    debug({ msg: 'خطأ عند cancel()', err: e }, 'error');
   }
   currentUtterance = null;
   if (typeof responsiveVoice !== "undefined") {
     try {
-      // إذا كانت responsiveVoice متاحة ومؤيدة للأصوات ستحاول استخدامها أولاً
       if (typeof responsiveVoice.voiceSupport === 'function' ? responsiveVoice.voiceSupport() : true) {
         responsiveVoice.cancel();
         responsiveVoice.speak(text, "Deutsch Female", {
@@ -149,22 +183,18 @@ function speakText(text, btn) {
             try { btn.classList.remove('speaking'); } catch(e){}
           },
           onerror: () => {
-            // فشل responsiveVoice -> اعادة المحاولة عبر Web Speech API
-            if (DEBUG) console.log('responsiveVoice failed, falling back to webSpeech');
+            debug('responsiveVoice onerror - falling back to webSpeech', 'warn');
             webSpeech(text, btn);
           }
         });
-        // نجح الاستدعاء (أو على الأقل حاول responsiveVoice). نخرج.
-        if (DEBUG) console.log('used responsiveVoice for:', text);
-        // واجهة المستخدم
+        debug('used responsiveVoice for: ' + text, 'log');
         if (currentBtn) currentBtn.classList.remove('speaking');
         btn.classList.add('speaking');
         currentBtn = btn;
         return;
       }
     } catch (e) {
-      if (DEBUG) console.error('responsiveVoice threw:', e);
-      // استمرار إلى webSpeech كـ fallback
+      debug({ msg: 'responsiveVoice threw', err: e }, 'error');
     }
   }
 
@@ -180,7 +210,7 @@ function speakText(text, btn) {
 // Web Speech API — آمن للموبايل
 function webSpeech(text, btn) {
   if (!window.speechSynthesis) {
-    if (DEBUG) console.warn('speechSynthesis غير متاح');
+    debug('speechSynthesis غير متاح', 'warn');
     try { btn.classList.remove('speaking'); } catch(e){}
     return;
   }
@@ -196,9 +226,9 @@ function webSpeech(text, btn) {
   const deVoice = voices.find(v => v.lang && v.lang.startsWith('de'));
   if (deVoice) {
     utter.voice = deVoice;
-    if (DEBUG) console.log('selected german voice:', deVoice.name, deVoice.lang);
+    debug('selected german voice: ' + (deVoice.name || deVoice.lang), 'log');
   } else {
-    if (DEBUG) console.log('no german voice found, using default voice');
+    debug('no german voice found, using default voice', 'log');
   }
 
   utter.onend = () => {
@@ -207,7 +237,7 @@ function webSpeech(text, btn) {
   };
 
   utter.onerror = (e) => {
-    console.error('speech utter error:', e);
+    debug({ msg: 'speech utter error', err: e }, 'error');
     try { btn.classList.remove('speaking'); } catch(e){}
     currentUtterance = null;
   };
@@ -215,10 +245,9 @@ function webSpeech(text, btn) {
   currentUtterance = utter;
 
   try {
-    // قد ترفض المتصفحات speak() في حالات نادرة — لذا نستخدم try/catch
     synth.speak(utter);
   } catch (err) {
-    console.error('speak() threw:', err);
+    debug({ msg: 'speak() threw', err: err }, 'error');
     try { btn.classList.remove('speaking'); } catch(e){}
     currentUtterance = null;
   }
@@ -348,7 +377,7 @@ async function loadAIExamples(card, sentence) {
       box.appendChild(row);
     });
   } catch (err) {
-    console.error('Failed to load AI examples:', err);
+    debug({ msg: 'Failed to load AI examples', err }, 'error');
     box.textContent = 'خطأ في توليد الأمثلة';
   }
 }
@@ -359,10 +388,8 @@ function initApp() {
   updateFavCount();
   renderSentences('shopping');
   loadVoices(); // تحميل الأصوات عند بدء التطبيق
-  if (DEBUG) {
-    console.log('initApp done. speechSynthesis supported?', !!window.speechSynthesis);
-    console.log('initial voices:', window.speechSynthesis ? window.speechSynthesis.getVoices() : []);
-  }
+  debug({ msg: 'initApp done', speechSynthesisSupported: !!window.speechSynthesis }, 'log');
+  debug({ msg: 'initial voices', voices: window.speechSynthesis ? window.speechSynthesis.getVoices() : [] }, 'log');
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
