@@ -472,101 +472,52 @@ async function loadAIExamples(card, sentence) {
   box.innerHTML = `
     <div style="display: flex; align-items: center; gap: 10px; color: #666;">
       <div class="spinner"></div>
-      <span>⏳ يتم توليد أمثلة ذكية بواسطة Claude AI...</span>
+      <span>⏳ يتم توليد أمثلة ذكية بواسطة الذكاء الاصطناعي...</span>
     </div>
   `;
   card.appendChild(box);
 
   try {
-    // استدعاء Claude API مباشرة من المتصفح (مجاني!)
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    // الاتصال بالخادم الخلفي الخاص بك
+    const response = await fetch("https://baker-l14t.onrender.com/generate-examples", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1000,
-        messages: [
-          {
-            role: "user",
-            content: `أنت معلم لغة ألمانية محترف. أعطني 3 جمل ألمانية جديدة بنفس معنى الجملة التالية، مناسبة لمستوى ${sentence.level || 'A1'}:
-
-"${sentence.german}"
-
-القواعد المهمة:
-- 3 جمل فقط، لا أكثر ولا أقل
-- بدون ترجمة عربية أو إنجليزية
-- بدون ترقيم أو رموز (-, •, 1., 2., إلخ)
-- كل جملة في سطر منفصل
-- استخدم مفردات وتراكيب نحوية مناسبة لمستوى ${sentence.level || 'A1'}
-- الجمل يجب أن تكون مختلفة عن بعضها في التركيب
-
-مثال للشكل المطلوب:
-Ich gehe heute einkaufen
-Heute mache ich meine Einkäufe
-Ich kaufe heute ein`
-          }
-        ]
+        german: sentence.german,
+        level: sentence.level || 'A1'
       })
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`فشل في تحميل الأمثلة: ${response.status}`);
     }
 
     const data = await response.json();
     
-    // استخراج النص من الرد
-    let text = '';
-    if (data.content && data.content[0] && data.content[0].text) {
-      text = data.content[0].text;
-    } else {
-      throw new Error('Invalid response format');
+    // التحقق من وجود أمثلة في الرد
+    if (!data.examples || !Array.isArray(data.examples) || data.examples.length === 0) {
+      throw new Error('لم يتم استلام أي أمثلة صالحة');
     }
-
-    console.log('✅ Claude Response:', text);
-
-    // تنظيف وفلترة الجمل
-    const examples = text
-      .split('\n')
-      .map(line => line.replace(/^[-•\d.)\s*]+/, '').trim()) // إزالة الترقيم
-      .filter(line => {
-        // فلتر الجمل الألمانية فقط
-        return line.length > 10 && 
-               /[a-zA-ZäöüßÄÖÜ]/.test(line) && // يحتوي على أحرف ألمانية
-               !line.includes(':') && // ليس عنوان
-               !line.toLowerCase().includes('beispiel') && // ليس كلمة "مثال"
-               !line.toLowerCase().includes('sentence'); // ليس كلمة "جملة"
-      })
-      .slice(0, 3); // أول 3 جمل فقط
 
     // تحديث الصندوق بالأمثلة
     box.innerHTML = '';
 
-    if (examples.length === 0) {
-      box.innerHTML = `
-        <div style="text-align: center; padding: 20px; color: #999;">
-          ❌ لم يتم إنشاء أمثلة صحيحة. حاول مرة أخرى.
-        </div>
-      `;
-      return;
-    }
-
     // إضافة عنوان
     const header = document.createElement('div');
     header.style.cssText = 'font-weight: bold; color: #4A90E2; margin-bottom: 10px; font-size: 0.95em;';
-    header.innerHTML = '🤖 أمثلة مولدة بواسطة Claude AI:';
+    header.innerHTML = '🤖 أمثلة مولدة بواسطة الذكاء الاصطناعي:';
     box.appendChild(header);
 
     // عرض كل مثال مع زر النطق
-    examples.forEach((ex, index) => {
+    data.examples.forEach((ex, index) => {
       const row = document.createElement('div');
       row.className = 'example-row';
       row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px;';
 
       const text = document.createElement('span');
-      text.style.cssText = 'flex: 1; font-size: 1em; color: #333;';
+      text.style.cssText = 'flex: 1; font-size: 1em; color: #333; word-break: break-word;';
       text.textContent = `${index + 1}. ${ex}`;
 
       const soundBtn = document.createElement('button');
@@ -597,70 +548,22 @@ Ich kaufe heute ein`
     // إضافة footer
     const footer = document.createElement('div');
     footer.style.cssText = 'margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0; font-size: 0.85em; color: #999; text-align: center;';
-    footer.textContent = '✨ مدعوم بتقنية Claude AI';
+    footer.innerHTML = '✨ مدعوم بواسطة <a href="https://baker-l14t.onrender.com/" target="_blank" style="color: #4A90E2; text-decoration: none;">خادمنا الذكي</a>';
     box.appendChild(footer);
 
   } catch (err) {
-    console.error('❌ Error:', err);
+    console.error('❌ خطأ في تحميل الأمثلة:', err);
     box.innerHTML = `
       <div style="text-align: center; padding: 20px; color: #e74c3c;">
         <div style="font-size: 2em; margin-bottom: 10px;">❌</div>
         <div style="font-weight: bold; margin-bottom: 5px;">فشل تحميل الأمثلة</div>
-        <div style="font-size: 0.9em; color: #999;">
-          ${err.message || 'حدث خطأ غير متوقع'}
+        <div style="font-size: 0.9em; color: #999; margin-bottom: 15px;">
+          ${err.message || 'حدث خطأ غير متوقع. حاول مرة أخرى بعد قليل'}
         </div>
-        <button onclick="this.parentElement.parentElement.remove()" style="margin-top: 15px; padding: 8px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        <button onclick="this.parentElement.parentElement.remove()" style="padding: 8px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; transition: background 0.3s;">
           إغلاق
         </button>
       </div>
     `;
   }
 }
-
-// إضافة CSS للـ spinner (loading animation)
-if (!document.getElementById('spinner-style')) {
-  const style = document.createElement('style');
-  style.id = 'spinner-style';
-  style.textContent = `
-    .spinner {
-      width: 20px;
-      height: 20px;
-      border: 3px solid #f3f3f3;
-      border-top: 3px solid #4A90E2;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    .ai-examples {
-      margin-top: 15px;
-      padding: 15px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-      color: white;
-    }
-    
-    .example-row {
-      animation: slideIn 0.3s ease-out;
-    }
-    
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(-10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-  `;
-  document.head.appendChild(style);
-}
-
-
