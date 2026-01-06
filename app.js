@@ -208,7 +208,7 @@ function renderSentenceCard(sentence) {
     usage
   );
 
-  card.onclick = () => speakText(sentence.german, speakBtn);
+  // card.onclick = () => speakText(sentence.german, speakBtn);
 
   return card;
 }
