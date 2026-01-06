@@ -94,48 +94,56 @@ function renderFavorites() {
 }
 
 // ================== SPEECH ==================
+// ✅ الحل: تشغيل الصوت مباشرة بدون أي تأخير
 
-let currentUtterance = null;
-
-// تشغيل الصوت (نقطة الدخول الوحيدة)
 function speakText(text, btn) {
-  if (!window.speechSynthesis) return;
+  if (!window.speechSynthesis) {
+    alert("النطق غير مدعوم في هذا المتصفح");
+    return;
+  }
 
   const synth = window.speechSynthesis;
-
+  
   // إيقاف أي صوت سابق
   synth.cancel();
   if (typeof responsiveVoice !== "undefined") {
     responsiveVoice.cancel();
   }
 
-  // UI
-  if (currentBtn) currentBtn.classList.remove('speaking');
+  // تحديث UI
+  if (currentBtn) {
+    currentBtn.classList.remove('speaking');
+  }
   btn.classList.add('speaking');
   currentBtn = btn;
 
-  // محاولة ResponsiveVoice (إن كان موجودًا)
+  // محاولة استخدام ResponsiveVoice أولاً (إن كان متوفراً)
   if (typeof responsiveVoice !== "undefined" && responsiveVoice.voiceSupport()) {
     try {
       responsiveVoice.speak(text, "Deutsch Female", {
         rate: 0.8,
-        onend: () => btn.classList.remove('speaking'),
-        onerror: () => webSpeech(text, btn)
+        onend: () => {
+          btn.classList.remove('speaking');
+          currentBtn = null;
+        },
+        onerror: () => {
+          // إذا فشل ResponsiveVoice، استخدم Web Speech API
+          fallbackToWebSpeech(text, btn);
+        }
       });
-      return; // ✔ داخل click
+      return;
     } catch (e) {
-      // fallback
+      console.log("ResponsiveVoice failed, using fallback");
     }
   }
 
-  // fallback آمن
-  webSpeech(text, btn);
+  // استخدام Web Speech API مباشرة
+  fallbackToWebSpeech(text, btn);
 }
 
-// Web Speech API — آمن للموبايل
-function webSpeech(text, btn) {
+function fallbackToWebSpeech(text, btn) {
   const synth = window.speechSynthesis;
-
+  
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = 'de-DE';
   utter.rate = 0.9;
@@ -143,42 +151,31 @@ function webSpeech(text, btn) {
   // اختيار صوت ألماني إن وُجد
   const voices = synth.getVoices();
   const deVoice = voices.find(v => v.lang.startsWith('de'));
-  if (deVoice) utter.voice = deVoice;
+  if (deVoice) {
+    utter.voice = deVoice;
+  }
 
   utter.onend = () => {
     btn.classList.remove('speaking');
-    currentUtterance = null;
+    currentBtn = null;
   };
 
   utter.onerror = () => {
     btn.classList.remove('speaking');
-    currentUtterance = null;
+    currentBtn = null;
   };
 
-  currentUtterance = utter;
-
-  // ⚠️ مهم: speak مباشرة بدون أي async
+  // ⚠️ مهم جداً: تشغيل الصوت مباشرة بدون أي async
   synth.speak(utter);
 }
 
-    
-   
-
-
-
-    
-     
-   
-
-
-
-
-        
-       
-
-
-
-  
+// تحميل الأصوات عند بداية الصفحة
+if (window.speechSynthesis) {
+  window.speechSynthesis.getVoices();
+  window.speechSynthesis.onvoiceschanged = () => {
+    window.speechSynthesis.getVoices();
+  };
+}
 
 // ================== CARD ==================
 function renderSentenceCard(sentence) {
@@ -195,8 +192,10 @@ function renderSentenceCard(sentence) {
   const speakBtn = document.createElement('button');
   speakBtn.className = 'speak-btn';
   speakBtn.textContent = '🔊';
+  // ✅ الحل: استدعاء مباشر بدون stopPropagation
   speakBtn.onclick = e => {
     e.stopPropagation();
+    // تشغيل الصوت فوراً
     speakText(sentence.german, speakBtn);
   };
 
@@ -234,7 +233,10 @@ function renderSentenceCard(sentence) {
     usage
   );
 
-  card.onclick = () => speakText(sentence.german, speakBtn);
+  // ✅ تشغيل الصوت عند الضغط على البطاقة نفسها
+  card.onclick = () => {
+    speakText(sentence.german, speakBtn);
+  };
 
   return card;
 }
@@ -276,28 +278,42 @@ async function loadAIExamples(card, sentence) {
   box.textContent = '⏳ يتم توليد أمثلة...';
   card.appendChild(box);
 
-  const res = await fetch('https://baker-l14t.onrender.com/api/generate-examples', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      german: sentence.german,
-      level: sentence.level
-    })
-  });
+  try {
+    const res = await fetch('https://baker-l14t.onrender.com/api/generate-examples', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        german: sentence.german,
+        level: sentence.level
+      })
+    });
 
-  const data = await res.json();
-  box.innerHTML = '';
+    const data = await res.json();
+    box.innerHTML = '';
 
-  data.examples.forEach(ex => {
-    const row = document.createElement('div');
-    row.className = 'example-row';
-    row.innerHTML = `${ex} <button>🔊</button>`;
-    row.querySelector('button').onclick = e => {
-      e.stopPropagation();
-      speakText(ex, e.target);
-    };
-    box.appendChild(row);
-  });
+    data.examples.forEach(ex => {
+      const row = document.createElement('div');
+      row.className = 'example-row';
+      
+      const textSpan = document.createElement('span');
+      textSpan.textContent = ex;
+      
+      const exampleSpeakBtn = document.createElement('button');
+      exampleSpeakBtn.textContent = '🔊';
+      // ✅ الحل: تشغيل مباشر للأمثلة أيضاً
+      exampleSpeakBtn.onclick = e => {
+        e.stopPropagation();
+        speakText(ex, exampleSpeakBtn);
+      };
+      
+      row.appendChild(textSpan);
+      row.appendChild(exampleSpeakBtn);
+      box.appendChild(row);
+    });
+  } catch (error) {
+    box.textContent = '❌ حدث خطأ في تحميل الأمثلة';
+    console.error('AI Examples Error:', error);
+  }
 }
 
 // ================== INIT ==================
@@ -307,4 +323,5 @@ function initApp() {
   renderSentences('shopping');
 }
 
+// تشغيل التطبيق عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', initApp);
