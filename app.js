@@ -3,10 +3,45 @@
 // ====== Favorites & State ======
 let favorites = JSON.parse(localStorage.getItem('shortSentencesFavorites')) || [];
 let currentBtn = null;
+// ====== Level Filter State ======
+let currentLevel = 'all';
+
+
+
 
 // ====== Indexing structures ======
 let flatList = [];        // array of { id, tab, german, arabic, usage, searchText }
 let tokenMap = new Map(); // token -> Set of ids
+
+
+
+
+function filterByLevel(level) {
+  currentLevel = level;
+
+  // تفعيل الزر المختار
+  document.querySelectorAll('.level-filter-btn').forEach(btn => {
+    btn.classList.remove('active');
+    if (
+      btn.textContent.includes(level) ||
+      (level === 'all' && btn.textContent.includes('الكل'))
+    ) {
+      btn.classList.add('active');
+    }
+  });
+
+  // إعادة رسم التاب الحالي
+  const activeTab = document.querySelector('.tab-content.active');
+  if (!activeTab) return;
+
+  if (activeTab.id === 'favorites') {
+    renderFavorites();
+  } else if (activeTab.id === 'searchResults') {
+    searchSentences();
+  } else {
+    renderSentences(activeTab.id);
+  }
+}
 
 // ====== Dark Mode ======
 function toggleDarkMode() {
@@ -107,25 +142,32 @@ function isFavorite(sentence) {
     return favorites.findIndex(f => f.german === sentence.german && f.arabic === sentence.arabic) > -1;
 }
 
+
+
 function renderFavorites() {
-    const grid = document.getElementById('favoritesGrid');
-    const noFavMsg = document.getElementById('noFavorites');
+  const grid = document.getElementById('favoritesGrid');
+  const noFavMsg = document.getElementById('noFavorites');
 
-    if (!grid || !noFavMsg) return;
+  grid.innerHTML = '';
 
-    grid.innerHTML = '';
+  const filtered = favorites.filter(sentence =>
+    currentLevel === 'all' || sentence.level === currentLevel
+  );
 
-    if (favorites.length === 0) {
-        noFavMsg.style.display = 'block';
-        grid.style.display = 'none';
-    } else {
-        noFavMsg.style.display = 'none';
-        grid.style.display = 'grid';
-        favorites.forEach(sentence => {
-            grid.appendChild(renderSentenceCard(sentence));
-        });
-    }
+  if (filtered.length === 0) {
+    noFavMsg.style.display = 'block';
+    grid.style.display = 'none';
+    return;
+  }
+
+  noFavMsg.style.display = 'none';
+  grid.style.display = 'grid';
+
+  filtered.forEach(sentence => {
+    grid.appendChild(renderSentenceCard(sentence));
+  });
 }
+
 
 // ====== Render Sentence Card ======
 function renderSentenceCard(sentence) {
@@ -201,17 +243,22 @@ function toggleFavBtn(btn, event, sentence) {
 
 // ====== Render Tab Content ======
 function renderSentences(tabId) {
-    const grid = document.querySelector(`#${tabId} .sentences-grid`);
-    if (!grid) return;
-    grid.innerHTML = '';
+  const grid = document.querySelector(`#${tabId} .sentences-grid`);
+  if (!grid) return;
 
-    // If tab exists in sentencesData, render from there
-    if (sentencesData[tabId] && Array.isArray(sentencesData[tabId])) {
-        sentencesData[tabId].forEach(s => {
-            grid.appendChild(renderSentenceCard(s));
-        });
-    }
+  grid.innerHTML = '';
+
+  if (!sentencesData[tabId]) return;
+
+  sentencesData[tabId]
+    .filter(sentence =>
+      currentLevel === 'all' || sentence.level === currentLevel
+    )
+    .forEach(sentence => {
+      grid.appendChild(renderSentenceCard(sentence));
+    });
 }
+
 
 // ====== Utility: normalize & tokenize ======
 function normalizeText(text) {
@@ -242,6 +289,7 @@ function buildIndex() {
                 german: sentence.german,
                 arabic: sentence.arabic,
                 usage: sentence.usage,
+                level: sentence.level,
                 searchText
             };
             flatList.push(item);
@@ -316,14 +364,19 @@ function searchSentences(query) {
         for (const id of candidateIds) {
             const item = flatList[id];
             if (item && item.searchText.includes(query)) {
-                found.push({ german: item.german, arabic: item.arabic, usage: item.usage });
+                if (currentLevel === 'all' || item.level === currentLevel) {
+    found.push(item);
+}
+
             }
         }
     } else {
         // Fallback: linear scan (safe for small datasets)
         for (const item of flatList) {
             if (item.searchText.includes(query)) {
-                found.push({ german: item.german, arabic: item.arabic, usage: item.usage });
+              if (currentLevel === 'all' || item.level === currentLevel) {
+    found.push(item);
+}
             }
         }
     }
