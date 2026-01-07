@@ -192,6 +192,7 @@ function openTab(e, tabId) {
 }
 
 // ================== AI EXAMPLES ==================
+
 async function loadAIExamples(card, sentence) {
   let box = card.querySelector('.ai-examples');
   if (box) return box.remove();
@@ -201,37 +202,52 @@ async function loadAIExamples(card, sentence) {
   box.textContent = '⏳ يتم توليد أمثلة...';
   card.appendChild(box);
 
-  const res = await fetch('https://baker-l14t.onrender.com/api/generate-examples', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      german: sentence.german,
-      level: sentence.level
-    })
-  });
+  try {
+    const res = await fetch('https://baker-l14t.onrender.com/api/generate-examples', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        german: sentence.german,
+        level: sentence.level
+      })
+    });
 
-  const data = await res.json();
-  console.log('✅ AI Examples:', data);
-  box.innerHTML = '';
+    const data = await res.json();
+    console.log('✅ AI Examples:', data);
+    
+    // ✅ التحقق من وجود أمثلة
+    if (!data.examples || data.examples.length === 0) {
+      box.textContent = '❌ لم يتم العثور على أمثلة';
+      return;
+    }
 
-  data.examples.forEach(ex => {
-    const row = document.createElement('div');
-    row.className = 'example-row';
-    // row.innerHTML = `${ex} <button>🔊</button>`;
-    row.innerHTML = `
-      <span class="german">${ex.german}</span> – 
-      <span class="arabic">${ex.arabic}</span>
-      <button>🔊</button>
-    `;
-    row.querySelector('button').onclick = e => {
-      e.stopPropagation();
-      speakText(ex, e.target);
-    };
-    box.appendChild(row);
-  });
+    box.innerHTML = '';
+
+    data.examples.forEach(ex => {
+      const row = document.createElement('div');
+      row.className = 'example-row';
+      
+      row.innerHTML = `
+        <span class="german">${ex.german}</span> – 
+        <span class="arabic">${ex.arabic}</span>
+        <button class="speak-btn">🔊</button>
+      `;
+      
+      // ✅ نطق النص الألماني فقط
+      row.querySelector('.speak-btn').onclick = (e) => {
+        e.stopPropagation();
+        speakText(ex.german, e.target); // ✅ تمرير النص الألماني فقط
+      };
+      
+      box.appendChild(row);
+    });
+
+  } catch (error) {
+    console.error('❌ Error loading AI examples:', error);
+    box.textContent = '❌ حدث خطأ أثناء تحميل الأمثلة';
+  }
 }
-
-// ================== INIT ==================
+================== INIT ==================
 function initApp() {
   loadDarkMode();
   updateFavCount();
