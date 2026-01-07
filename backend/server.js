@@ -33,7 +33,17 @@ app.post("/api/generate-examples", async (req, res) => {
 
   console.log("📥 Request received:", { german, level });
 
-  const prompt = `أعطني 3 جمل ألمانية جديدة بنفس معنى: "${german}" بمستوى ${level} بدون ترجمة`;
+// const prompt = `أعطني 3 جمل ألمانية جديدة بنفس معنى: "${german}" بمستوى ${level} بدون ترجمة`;
+// ✅ تعديل الـ prompt لطلب الترجمة العربية
+  const prompt = `أعطني 3 جمل ألمانية جديدة بنفس معنى: "${german}" بمستوى ${level}.
+  
+اكتب كل مثال بالصيغة التالية بالضبط:
+الألمانية: [الجملة الألمانية]
+العربية: [الترجمة العربية]
+
+مثال على التنسيق:
+الألمانية: Ich gehe ins Kino.
+العربية: أنا أذهب إلى السينما.`;
 
   try {
     const completion = await openai.chat.completions.create({
