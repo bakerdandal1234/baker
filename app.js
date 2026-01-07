@@ -220,12 +220,7 @@ function openTab(e, tabId) {
     alert(ex) 
     const row = document.createElement('div');
     row.className = 'example-row';
-    // row.innerHTML = `${ex} <button>🔊</button>`;
-    row.innerHTML = `
-      <span class="german">${ex.german}</span> – 
-      <span class="arabic">${ex.arabic}</span>
-      <button>🔊</button>
-    `;
+    row.innerHTML = `${ex} <button>🔊</button>`; 
     row.querySelector('button').onclick = e => {
       e.stopPropagation();
       speakText(ex, e.target);
