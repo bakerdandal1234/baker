@@ -2,9 +2,11 @@
 import express from "express";
 import OpenAI from "openai";
 import dotenv from "dotenv";
+import cors from "cors";  
 dotenv.config();
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 // ⚡ لا تحتاج لمكتبة node-fetch في Node 18+
 const openai = new OpenAI({
