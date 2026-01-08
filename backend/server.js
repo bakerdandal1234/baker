@@ -50,7 +50,38 @@ app.post("/api/generate-examples", async (req, res) => {
     }
 
     // ✅ نص بسيط ومباشر يعمل مع جميع النماذج
-    const prompt = `Generate 3 simple German sentences at different levels based on: "${german}". Format each as: GERMAN: sentence | ARABIC: translation | LEVEL: level | NOTE: brief reason. Keep it practical and accurate.`;
+     const prompt = `
+أنت مدرس لغة ألمانية محترف. ولد 3 أمثلة متدرجة لهذه الجملة الألمانية:
+
+**الجملة الأصلية:** "${german}"
+**الترجمة العربية:** "${arabic || 'غير متوفرة'}"
+**المستوى الحالي:** ${level}
+
+**التعليمات:**
+1. ولد 3 جمل جديدة بنفس المفهوم ولكن بمستويات مختلفة وفقاً للقاعدة التالية:
+   - إذا كانت الجملة A1: أنشئ أمثلة لـ A2، B1، B2
+   - إذا كانت الجملة A2: أنشئ أمثلة لـ A1، B1، B2
+   - إذا كانت الجملة B1: أنشئ أمثلة لـ A1، A2، B2
+   - إذا كانت الجملة B2: أنشئ أمثلة لـ A1، A2، B1
+
+2. لكل جملة متولدة، قدم بالضبط بالتنسيق التالي:
+   GERMAN: [الجملة الألمانية] | ARABIC: [الترجمة العربية] | LEVEL: [المستوى] | NOTE: [سبب المستوى]
+
+3. اتبع مواصفات المستويات بدقة:
+   - A1: جمل قصيرة جداً، كلمات أساسية، تركيب بسيط، زمن المضارع فقط
+   - A2: جمل قصيرة، كلمات يومية، أزمنة أساسية (مضارع، ماضي بسيط)
+   - B1: جمل مركبة، كلمات متنوعة، أزمنة متعددة، تعابير اصطلاحية أساسية
+   - B2: جمل معقدة، كلمات متخصصة، أزمنة وأوضاع نحوية متقدمة
+
+**مثال:**
+للجملة الأصلية "Wo ist die Milch?" (المستوى A1):
+GERMAN: Wo kann ich Milch kaufen? | ARABIC: أين يمكنني شراء الحليب؟ | LEVEL: A2 | NOTE: استخدام فعل "können" ويضاف سياق الشراء
+GERMAN: Könnten Sie mir bitte sagen, wo sich die Milchabteilung befindet? | ARABIC: هل يمكنكم إخباري أين يقع قسم الألبان؟ | LEVEL: B1 | NOTE: استخدام صيغة مهذبة مع هيكل جملة معقد
+GERMAN: Ich würde es sehr schätzen, wenn Sie mich darüber informieren könnten, in welchem Bereich des Geschäfts die verschiedenen Milchsorten, einschließlich laktosefreier Optionen, verfügbar sind. | ARABIC: سأكون ممتناً لو أمكنكم إعلامي في أي قسم من المحل تتوفر أنواع الحليب المختلفة، بما في ذلك الخيارات الخالية من اللاكتوز. | LEVEL: B2 | NOTE: لغة رسمية معقدة مع جمل فرعية متعددة
+
+**الآن، ولد الأمثلة لهذه الجملة: "${german}" (المستوى ${level})
+**`;
+
     
     console.log("🧠 جاري إرسال النص إلى النموذج...");
     
