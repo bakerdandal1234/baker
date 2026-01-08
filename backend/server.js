@@ -8,6 +8,11 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
+app.get("/", (req, res) => {
+  res.json({ message: "👋 Hello from the German examples API!" });
+});
+
+
 // ⚡ لا تحتاج لمكتبة node-fetch في Node 18+
 const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY || "" // ضع مفتاح OpenAI هنا إذا كان لديك
