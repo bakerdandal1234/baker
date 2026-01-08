@@ -1,105 +1,198 @@
+// server.js - الإصدار الصحيح الكامل
 import express from "express";
 import OpenAI from "openai";
 import dotenv from "dotenv";
 import cors from "cors";  
+
 dotenv.config();
 const app = express();
 app.use(express.json());
 app.use(cors());
 
-app.get("/", (req, res) => {
-  res.json({ message: "👋 Hello from the German examples API!" });
-});
+// ✅ إصلاح 1: المتغيرات البيئية الصحيحة
+const API_KEY = process.env.OPENROUTER_API_KEY || process.env.OPENAI_API_KEY;
+const API_BASE_URL = process.env.OPENROUTER_BASE_URL || "https://api.openai.com/v1";
 
-// ⚡ لا تحتاج لمكتبة node-fetch في Node 18+
+console.log("API Setup:");
+console.log("- Base URL:", API_BASE_URL);
+console.log("- API Key (masked):", API_KEY ? `${API_KEY.substring(0, 8)}...` : "NOT SET");
+
+// ✅ إصلاح 2: تهيئة OpenAI بشكل صحيح
 const openai = new OpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY || "" // ضع مفتاح OpenAI هنا إذا كان لديك
+  apiKey: API_KEY,
+  baseURL: API_BASE_URL,
 });
-console.log("OpenRouter API Key:", process.env.OPENROUTER_API_KEY);
 
+app.get("/", (req, res) => {
+  res.json({ 
+    status: "operational",
+    message: "✅ German Examples API is running",
+    info: {
+      endpoint: "/api/generate-examples",
+      method: "POST",
+      required_fields: ["german", "arabic", "level"]
+    }
+  });
+});
+
+// ✅ إصلاح 3: نقطة النهاية الصحيحة
 app.post("/api/generate-examples", async (req, res) => {
-  const { german, level } = req.body;
-
-  const prompt = `
-أنت مدرس لغة ألمانية محترف. مهمتك هي توليد أمثلة متدرجة لجمل ألمانية بناءً على مستواها التعليمي وفقاً لنظام CEFR. 
-
-## التعليمات:
-1. سأرسل لك جملة ألمانية بمستوى محدد (A1، A2، B1، أو B2) مع ترجمتها العربية.
-2. قم بتوليد 3 جمل جديدة بنفس المفهوم ولكن بمستويات مختلفة وفقاً للقاعدة التالية:
-   - إذا كانت الجملة A1: أنشئ أمثلة لـ A2، B1، B2
-   - إذا كانت الجملة A2: أنشئ أمثلة لـ A1، B1، B2
-   - إذا كانت الجملة B1: أنشئ أمثلة لـ A1، A2، B2
-   - إذا كانت الجملة B2: أنشئ أمثلة لـ A1، A2، B1
-
-3. لكل جملة متولدة، قدم:
-   - الجملة الألمانية
-   - الترجمة العربية الواضحة
-   - وصف مختصر لمستوى التعقيد (لماذا تعتبر من هذا المستوى)
-
-## مواصفات المستويات:
-- **A1 (مبتدئ)**: جمل قصيرة جداً، كلمات أساسية، تركيب بسيط جداً، زمن المضارع فقط
-- **A2 (ابتدائي)**: جمل قصيرة، كلمات يومية، أزمنة أساسية (مضارع، ماضي بسيط)، عبارات مألوفة
-- **B1 (متوسط)**: جمل مركبة، كلمات متنوعة، أزمنة متعددة، تعابير اصطلاحية أساسية
-- **B2 (متوسط متقدم)**: جمل معقدة، كلمات متخصصة، أزمنة وأوضاع نحوية متقدمة، تعابير اصطلاحية ولغة مجازية
-
-## تنسيق الخرج المطلوب (JSON):
-{
-  "original_sentence": {
-    "german": "الجملة الألمانية الأصلية",
-    "arabic": "الترجمة العربية الأصلية",
-    "level": "المستوى الأصلي"
-  },
-  "generated_examples": [
-    {
-      "german": "جملة ألمانية للمستوى الجديد",
-      "arabic": "ترجمة عربية دقيقة",
-      "level": "المستوى الجديد",
-      "complexity_note": "ملاحظة مختصرة عن سبب هذا المستوى (بالعربية)"
-    },
-    // ... مثالان آخران
-  ]
-}
-
-## مثال توضيحي (لا تكرره في الخرج، فقط للتوجيه):
-إذا أرسلت لك: 
-{
-  "german": "Wo ist die Milch?",
-  "arabic": "أين الحليب؟", 
-  "level": "A1"
-}
-
-ستولد أمثلة لـ A2 و B1 و B2 بنفس السياق (البحث عن الحليب في متجر).
-
-## ملاحظات هامة:
-- حافظ على السياق والمغزى الأساسي للجملة الأصلية
-- تأكد من دقة الترجمة العربية وملاءمتها للمستوى
-- لا تستخدم مصطلحات أو هياكل لغوية فوق مستوى الجملة المستهدفة
-- ركز على التعبيرات العملية التي يستخدمها المتحدثون الأصليون
-- تجنب الأخطاء النحوية والإملائية في اللغة الألمانية
-
-الآن، سأرسل لك الجملة الأصلية لتبدأ العمل.
-`;
-
   try {
+    const { german, arabic, level } = req.body;
+    
+    // التحقق من البيانات المطلوبة
+    if (!german || !level) {
+      return res.status(400).json({ 
+        error: "بيانات غير كافية",
+        required: ["german", "level"],
+        provided: Object.keys(req.body)
+      });
+    }
+
+    console.log(`📝 طلب جديد: "${german}" (${level})`);
+    
+    // ✅ إصلاح 4: Prompt مبسط وفعال
+    const prompt = `
+أنت خبير في تعليم اللغة الألمانية. أنشئ 3 أمثلة متدرجة لهذه الجملة:
+
+الجملة الأصلية: "${german}"
+المستوى الحالي: ${level}
+
+التعليمات:
+1. أنشئ 3 جمل بنفس المفهوم ولكن بمستويات تعليمية مختلفة:
+   - إذا كانت A1: أنشئ أمثلة لـ A2، B1، B2
+   - إذا كانت A2: أنشئ أمثلة لـ A1، B1، B2
+   - إذا كانت B1: أنشئ أمثلة لـ A1، A2، B2
+   - إذا كانت B2: أنشئ أمثلة لـ A1، A2، B1
+
+2. لكل جملة، قدم بالضبط بهذا التنسيق:
+   GERMAN: [الجملة] | ARABIC: [الترجمة] | LEVEL: [المستوى] | NOTE: [سبب المستوى]
+
+3. استخدم هذه المواصفات:
+   A1: جمل قصيرة جداً، كلمات أساسية، زمن المضارع فقط
+   A2: جمل قصيرة، كلمات يومية، أزمنة أساسية
+   B1: جمل مركبة، كلمات متنوعة، أزمنة متعددة
+   B2: جمل معقدة، كلمات متخصصة، تعابير اصطلاحية
+
+4. حافظ على السياق والمغزى الأساسي للجملة الأصلية
+5. ركز على التعبيرات العملية التي يستخدمها المتحدثون الأصليون
+6. تجنب الأخطاء النحوية والإملائية
+    `;
+
+    // ✅ إصلاح 5: استخدام نموذج صحيح
     const completion = await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
-      messages: [{ role: "user", content: prompt }]
+      model: "gpt-3.5-turbo",
+      messages: [
+        { role: "system", content: "أنت مدرس لغة ألمانية محترف." },
+        { role: "user", content: prompt }
+      ],
+      temperature: 0.7,
+      max_tokens: 1000
     });
 
-    const text = completion.choices[0].message.content;
+    // ✅ إصلاح 6: معالجة الناتج
+    const responseText = completion.choices[0].message.content;
+    console.log("🤖 رد النموذج (مقتطف):", responseText.substring(0, 200) + "...");
 
-    const examples = text
-      .split("\n")
-      .map(l => l.replace(/^[-•\d.]/, "").trim())
-      .filter(Boolean);
+    // استخراج الأمثلة
+    const examples = [];
+    const lines = responseText.split('\n');
+    
+    for (const line of lines) {
+      const l = line.trim();
+      if (l && l.includes('GERMAN:') && l.includes('ARABIC:') && l.includes('LEVEL:')) {
+        examples.push(l);
+      }
+    }
 
+    // ✅ إصلاح 7: أمثلة احتياطية إذا فشل النموذج
+    if (examples.length < 3) {
+      console.warn(`⚠️ وجدت ${examples.length} أمثلة فقط. استخدام الأمثلة الاحتياطية.`);
+      return res.json({ 
+        examples: generateFallbackExamples(german, arabic, level),
+        warning: "تم استخدام أمثلة احتياطية"
+      });
+    }
+
+    console.log(`✅ تم توليد ${examples.length} أمثلة بنجاح`);
     res.json({ examples });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "حدث خطأ أثناء توليد الأمثلة" });
+
+  } catch (error) {
+    console.error("❌ خطأ في الخادم:", error.message);
+    console.error("التفاصيل:", error);
+    
+    // ✅ إصلاح 8: معالجة الأخطاء بشكل ودّي
+    if (error.message.includes('authentication')) {
+      return res.status(401).json({ 
+        error: "مشكلة في مصادقة API",
+        details: "يرجى التحقق من مفتاح API"
+      });
+    }
+    
+    // أمثلة احتياطية عند حدوث أي خطأ
+    const { german, arabic, level } = req.body;
+    res.status(500).json({ 
+      examples: generateFallbackExamples(german, arabic, level),
+      error: "تم استخدام أمثلة احتياطية بسبب خطأ في الخدمة",
+      debug: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 });
 
-app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000");
+// ✅ دالة الأمثلة الاحتياطية (مهمة للتشغيل)
+function generateFallbackExamples(german, arabic, level) {
+  const examples = [];
+  const targetLevels = [];
+  
+  // تحديد المستويات المستهدفة
+  if (level === 'A1') targetLevels.push('A2', 'B1', 'B2');
+  else if (level === 'A2') targetLevels.push('A1', 'B1', 'B2');
+  else if (level === 'B1') targetLevels.push('A1', 'A2', 'B2');
+  else if (level === 'B2') targetLevels.push('A1', 'A2', 'B1');
+  else targetLevels.push('A1', 'A2', 'B1');
+  
+  // إنشاء أمثلة احتياطية
+  targetLevels.forEach((lvl, i) => {
+    let exampleGerman, exampleArabic, note;
+    
+    switch(lvl) {
+      case 'A1':
+        exampleGerman = german.replace('?', '!').replace('.', '!');
+        exampleArabic = arabic.replace('؟', '!').replace('.', '!');
+        note = "ترجمة بسيطة جداً";
+        break;
+      case 'A2':
+        exampleGerman = german.includes('?') ? 
+          german.replace('?', ', bitte?') : 
+          german + ', bitte.';
+        exampleArabic = arabic.includes('؟') ? 
+          arabic.replace('؟', '، من فضلك؟') : 
+          arabic + '، من فضلك.';
+        note = "إضافة كلمات مهذبة";
+        break;
+      case 'B1':
+        exampleGerman = `Ich möchte wissen, ${german.toLowerCase().replace('?', '').replace('.', '').replace('!', '')}?`;
+        exampleArabic = `أود أن أعرف ${arabic.replace('؟', '').replace('.', '').replace('!', '')}؟`;
+        note = "هيكل جملة مركب";
+        break;
+      case 'B2':
+      default:
+        exampleGerman = `Es wäre hilfreich zu wissen, ${german.toLowerCase().replace('?', '').replace('.', '').replace('!', '')}.`;
+        exampleArabic = `سيكون من المفيد أن أعرف ${arabic.replace('؟', '').replace('.', '').replace('!', '')}.`;
+        note = "هيكل لغوي متقدم";
+    }
+    
+    examples.push(
+      `GERMAN: ${exampleGerman} | ARABIC: ${exampleArabic} | LEVEL: ${lvl} | NOTE: ${note}`
+    );
+  });
+  
+  return examples;
+}
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 الخادم يعمل على المنفذ ${PORT}`);
+  console.log(`🔗 اذهب إلى: http://localhost:${PORT}`);
+  console.log(`🧪 اختبر نقطة النهاية: POST /api/generate-examples`);
 });
