@@ -81,7 +81,7 @@ app.post("/api/generate-examples", async (req, res) => {
 
     // ✅ إصلاح 5: استخدام نموذج صحيح
     const completion = await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
+      model: "gpt-3.5-turbo",
       messages: [
         { role: "system", content: "أنت مدرس لغة ألمانية محترف." },
         { role: "user", content: prompt }
