@@ -3,8 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قوالب الكتابة الـ 8 لامتحان A2</title>
+    <title>ÖSD A2 - الأسئلة الرسمية مع الإجابات</title>
     <style>
+        @media print {
+            body { margin: 0; padding: 10mm; }
+            .no-print { display: none; }
+            .page-break { page-break-before: always; }
+        }
+        
         * {
             margin: 0;
             padding: 0;
@@ -19,7 +25,7 @@
         }
         
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
             border-radius: 15px;
@@ -39,64 +45,62 @@
             margin-bottom: 10px;
         }
         
-        header p {
-            font-size: 1.1em;
-            opacity: 0.9;
-        }
-        
         .content {
-            padding: 30px;
+            padding: 40px;
         }
         
-        .template-card {
+        .question-block {
             background: #f8f9fa;
             border-right: 5px solid #667eea;
             border-radius: 10px;
-            padding: 25px;
-            margin-bottom: 30px;
+            padding: 30px;
+            margin-bottom: 40px;
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
         }
         
-        .template-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
-        }
-        
-        .template-number {
+        .question-number {
             display: inline-block;
             background: #667eea;
             color: white;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             text-align: center;
-            line-height: 40px;
+            line-height: 50px;
             font-weight: bold;
-            font-size: 1.2em;
+            font-size: 1.5em;
             margin-left: 10px;
         }
         
-        .template-title {
-            font-size: 1.5em;
+        .question-title {
+            font-size: 1.8em;
             color: #2d3748;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
         }
         
-        .template-usage {
+        .source {
             background: #e3f2fd;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
+            padding: 10px 15px;
+            border-radius: 5px;
             color: #1565c0;
             font-weight: 500;
+            margin-bottom: 20px;
+            font-size: 0.9em;
         }
         
-        .german-template {
+        .situation {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-right: 4px solid #ffc107;
+        }
+        
+        .email-box {
             background: white;
-            border: 2px dashed #667eea;
+            border: 2px solid #667eea;
             padding: 20px;
             border-radius: 8px;
             margin: 15px 0;
@@ -105,42 +109,80 @@
             text-align: left;
             white-space: pre-line;
             color: #2d3748;
-            line-height: 1.8;
         }
         
-        .example {
-            background: #fff3cd;
+        .aufgabe {
+            background: #d1ecf1;
             padding: 20px;
             border-radius: 8px;
-            margin: 15px 0;
-            border-right: 4px solid #ffc107;
+            margin: 20px 0;
+            border-right: 4px solid #17a2b8;
         }
         
-        .example-title {
-            font-weight: bold;
-            color: #856404;
+        .aufgabe h3 {
+            color: #0c5460;
             margin-bottom: 10px;
-            font-size: 1.1em;
         }
         
-        .example-content {
-            background: white;
+        .punkteliste {
+            list-style: none;
+            padding-right: 20px;
+        }
+        
+        .punkteliste li {
+            padding: 5px 0;
+            padding-right: 25px;
+            position: relative;
+        }
+        
+        .punkteliste li:before {
+            content: "✓";
+            position: absolute;
+            right: 0;
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .answer-section {
+            margin-top: 30px;
+        }
+        
+        .answer-title {
+            background: #28a745;
+            color: white;
             padding: 15px;
+            border-radius: 8px 8px 0 0;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+        
+        .answer-content {
+            background: #d4edda;
+            padding: 25px;
+            border-radius: 0 0 8px 8px;
+            border: 2px solid #28a745;
+            border-top: none;
+        }
+        
+        .answer-text {
+            background: white;
+            padding: 20px;
             border-radius: 5px;
             font-family: 'Courier New', monospace;
             direction: ltr;
             text-align: left;
             white-space: pre-line;
             color: #2d3748;
+            line-height: 1.8;
+            margin-bottom: 15px;
         }
         
-        .importance {
-            display: inline-block;
-            background: #ffd700;
+        .word-count {
+            background: #ffc107;
             color: #856404;
-            padding: 5px 15px;
+            padding: 8px 15px;
             border-radius: 20px;
-            font-size: 0.9em;
+            display: inline-block;
             font-weight: bold;
             margin-top: 10px;
         }
@@ -165,422 +207,427 @@
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
         }
         
-        @media print {
-            body {
-                background: white;
-                padding: 0;
-            }
-            .container {
-                box-shadow: none;
-            }
-            .print-btn {
-                display: none;
-            }
-        }
-        
         @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.5em;
-            }
-            .content {
-                padding: 15px;
-            }
-            .template-card {
-                padding: 15px;
-            }
+            header h1 { font-size: 1.5em; }
+            .content { padding: 20px; }
+            .question-block { padding: 20px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>📝 قوالب الكتابة الـ 8 لامتحان A2</h1>
-            <p>جميع القوالب التي تحتاجها للنجاح في جزء الكتابة</p>
+            <h1>📚 ÖSD A2 - الأسئلة الرسمية مع الإجابات النموذجية</h1>
+            <p>جميع الأسئلة الـ 5 التي درسناها مع إجابتين نموذجيتين لكل سؤال</p>
         </header>
         
         <div class="content">
-            <button class="print-btn" onclick="window.print()">🖨️ طباعة الصفحة</button>
+            <button class="print-btn no-print" onclick="window.print()">🖨️ طباعة / حفظ PDF</button>
             
-            <!-- القالب 1 -->
-            <div class="template-card">
-                <div class="template-title">
-                    <span class="template-number">1</span>
-                    رسالة لصديق (غير رسمية)
-                </div>
-                <span class="importance">⭐⭐⭐⭐⭐ مهم جداً</span>
-                
-                <div class="template-usage">
-                    <strong>متى تستخدمها:</strong> رسالة لصديق، دعوة لحفلة، سؤال عن زيارة، مشاركة أخبار
+            <!-- السؤال 1 -->
+            <div class="question-block">
+                <div class="question-title">
+                    <span class="question-number">1</span>
+                    رسالة أحمد عن الوظيفة الجديدة
                 </div>
                 
-                <div class="german-template">Lieber [اسم ذكر] / Liebe [اسم أنثى],
-
-wie geht es dir? Mir geht es gut/sehr gut/super!
-
-[اكتب الموضوع هنا - 2-3 جمل بسيطة]
-
-Ich möchte [ماذا تريد] / Hast du Zeit am [يوم/تاريخ]? / 
-Kannst du [طلب منه شيء]?
-
-[جملة ختامية]
-
-Schreib mir bald! / Bis bald! / Ich freue mich auf deine Antwort!
-
-Viele Grüße / Liebe Grüße
-[اسمك]</div>
-                
-                <div class="example">
-                    <div class="example-title">✏️ مثال: دعوة لحفلة عيد ميلاد (58 كلمة)</div>
-                    <div class="example-content">Lieber Mohammed,
-
-wie geht es dir? Mir geht es super!
-
-Ich habe am Samstag, den 25. Januar, Geburtstag und mache eine große Party. Die Party beginnt um 18 Uhr bei mir zu Hause in der Hauptstraße 45. Wir essen leckere Pizza, hören schöne Musik und spielen lustige Spiele zusammen.
-
-Hast du Zeit am Samstag? Kannst du kommen?
-
-Ich freue mich sehr auf deine Antwort!
-
-Viele Grüße
-Ahmed</div>
-                </div>
-            </div>
-            
-            <!-- القالب 2 -->
-            <div class="template-card">
-                <div class="template-title">
-                    <span class="template-number">2</span>
-                    طلب معلومات (شبه رسمي)
-                </div>
-                <span class="importance">⭐⭐⭐⭐⭐ مهم جداً</span>
-                
-                <div class="template-usage">
-                    <strong>متى تستخدمه:</strong> طلب معلومات عن كورس، السؤال عن شقة للإيجار، الاستفسار عن منتج، حجز فندق
+                <div class="source">
+                    📎 المصدر: ÖSD Modellprüfung A2 / Österreich - Schreiben Teil 1
                 </div>
                 
-                <div class="german-template">Sehr geehrte Damen und Herren,
-
-ich habe Ihre Anzeige [في الجريدة/على الإنترنت] gelesen.
-Ich interessiere mich für [الموضوع] und möchte mehr Informationen.
-
-Können Sie mir bitte sagen:
-- [سؤال 1]?
-- [سؤال 2]?
-- [سؤال 3]?
-
-Vielen Dank für Ihre Hilfe.
-
-Mit freundlichen Grüßen
-[اسمك الكامل]</div>
-                
-                <div class="example">
-                    <div class="example-title">✏️ مثال: السؤال عن كورس ألماني (57 كلمة)</div>
-                    <div class="example-content">Sehr geehrte Damen und Herren,
-
-ich habe Ihre Anzeige im Internet gelesen. Ich interessiere mich sehr für den Deutschkurs für Anfänger und möchte gerne mehr Informationen bekommen.
-
-Können Sie mir bitte sagen:
-- Wie viel kostet der Kurs pro Monat?
-- Wann beginnt der Kurs und wie lange dauert er genau?
-- Ist der Kurs für das Niveau A2?
-
-Vielen Dank für Ihre Hilfe.
-
-Mit freundlichen Grüßen
-Ahmed Hassan</div>
-                </div>
-            </div>
-            
-            <!-- القالب 3 -->
-            <div class="template-card">
-                <div class="template-title">
-                    <span class="template-number">3</span>
-                    شكوى بسيطة
-                </div>
-                <span class="importance">⭐⭐⭐⭐ مهم</span>
-                
-                <div class="template-usage">
-                    <strong>متى تستخدمه:</strong> الشكوى من فندق، منتج لا يعمل، مشكلة في الخدمة، طلب استرجاع مال
+                <div class="situation">
+                    <strong>Situation:</strong><br>
+                    Sie bekommen von Ihrem Freund Ahmet folgende E-Mail:
                 </div>
                 
-                <div class="german-template">Sehr geehrte Damen und Herren,
+                <div class="email-box">Liebe/Lieber ...,
 
-ich war am [تاريخ] in [مكان] / ich habe [منتج] gekauft.
-Leider war ich nicht zufrieden.
+bei mir gibt es Neuigkeiten. Ich habe endlich Arbeit gefunden! Seit einem Monat arbeite ich als Verkäufer in einer Bäckerei. Leider habe ich nur am Sonntag frei, da mache ich mit meiner Familie meistens einen kleinen Ausflug.
 
-Das Problem ist:
-[اشرح المشكلة - 2-3 جمل]
+Und du? Wie geht es dir? Was machst du eigentlich? Arbeitest du? Und was machst du so in deiner Freizeit, z. B. am Wochenende?
 
-Ich möchte [ماذا تريد]:
-- mein Geld zurück / eine neue [منتج] / 
-  eine Entschädigung / das Problem lösen
-
-Bitte antworten Sie schnell.
-
-Mit freundlichen Grüßen
-[اسمك]</div>
-                
-                <div class="example">
-                    <div class="example-title">✏️ مثال: شكوى من فندق (58 كلمة)</div>
-                    <div class="example-content">Sehr geehrte Damen und Herren,
-
-ich war am letzten Wochenende in Ihrem Hotel im Zimmer Nummer 205. Leider war ich mit dem Service nicht zufrieden.
-
-Das Problem ist: Das Zimmer war sehr schmutzig und die Dusche war kaputt. Das Internet hat nicht funktioniert. Ich habe an der Rezeption zweimal gefragt, aber niemand hat mir geholfen.
-
-Ich möchte eine Entschädigung oder mein Geld zurück bekommen.
-
-Bitte antworten Sie schnell.
-
-Mit freundlichen Grüßen
-Ahmed Ali</div>
-                </div>
-            </div>
-            
-            <!-- القالب 4 -->
-            <div class="template-card">
-                <div class="template-title">
-                    <span class="template-number">4</span>
-                    دعوة رسمية/شبه رسمية
-                </div>
-                <span class="importance">⭐⭐⭐⭐ مهم</span>
-                
-                <div class="template-usage">
-                    <strong>متى تستخدمه:</strong> دعوة جار جديد، دعوة زميل عمل، دعوة لحدث
-                </div>
-                
-                <div class="german-template">Lieber [اسم] / Liebe [اسم],
-
-ich möchte dich/Sie zu [مناسبة] einladen.
-
-Die [Feier/Party/Veranstaltung] ist am [يوم], den [تاريخ] um [ساعة] Uhr in/bei [مكان].
-
-Wir werden [نشاط 1], [نشاط 2] und [نشاط 3].
-
-Kannst du/Können Sie kommen? Bitte gib/geben Sie mir bis [تاريخ] Bescheid.
-
-Ich freue mich auf dich/Sie!
-
-Viele Grüße / Mit freundlichen Grüßen
-[اسمك]</div>
-                
-                <div class="example">
-                    <div class="example-title">✏️ مثال: دعوة جيران (55 كلمة)</div>
-                    <div class="example-content">Liebe Nachbarn,
-
-ich möchte Sie herzlich zu einem kleinen Gartenfest einladen.
-
-Das Fest ist am Samstag, den 25. Januar um 16 Uhr bei mir im Garten in der Parkstraße 12. Wir werden zusammen grillen, schöne Musik hören und gemütlich essen.
-
-Können Sie kommen? Bitte geben Sie mir bis Freitag kurz Bescheid.
-
-Ich freue mich sehr auf Sie!
-
-Viele Grüße
-Ahmed</div>
-                </div>
-            </div>
-            
-            <!-- القالب 5 -->
-            <div class="template-card">
-                <div class="template-title">
-                    <span class="template-number">5</span>
-                    اعتذار
-                </div>
-                <span class="importance">⭐⭐⭐⭐ مهم</span>
-                
-                <div class="template-usage">
-                    <strong>متى تستخدمه:</strong> الاعتذار عن موعد، إلغاء دعوة، تأخير عن اجتماع
-                </div>
-                
-                <div class="german-template">Lieber [اسم] / Sehr geehrte Damen und Herren,
-
-vielen Dank für [الدعوة/الموعد/...].
-
-Leider kann ich [nicht kommen / den Termin nicht einhalten / ...], weil [السبب].
-
-Es tut mir sehr leid. Können wir einen neuen Termin machen?
-
-[اقتراح بديل إذا كان مناسباً]
-
-Ich bitte um Entschuldigung.
-
-Mit freundlichen Grüßen / Viele Grüße
-[اسمك]</div>
-                
-                <div class="example">
-                    <div class="example-title">✏️ مثال: اعتذار عن موعد (60 كلمة)</div>
-                    <div class="example-content">Sehr geehrte Damen und Herren,
-
-vielen Dank für den Termin am Montag, den 20. Januar um 10 Uhr morgens.
-
-Leider kann ich den wichtigen Termin nicht einhalten, weil ich sehr krank bin. Ich habe hohes Fieber und starke Kopfschmerzen und muss heute zum Arzt gehen.
-
-Es tut mir wirklich sehr leid. Können wir bitte einen neuen Termin vereinbaren? Ich habe am Mittwoch oder Donnerstag Zeit.
-
-Ich bitte um Entschuldigung.
-
-Mit freundlichen Grüßen
-Sara Ahmed</div>
-                </div>
-            </div>
-            
-            <!-- القالب 6 -->
-            <div class="template-card">
-                <div class="template-title">
-                    <span class="template-number">6</span>
-                    شكر
-                </div>
-                <span class="importance">⭐⭐⭐ مهم</span>
-                
-                <div class="template-usage">
-                    <strong>متى تستخدمه:</strong> شكر على هدية، شكر على مساعدة، شكر على دعوة
-                </div>
-                
-                <div class="german-template">Lieber [اسم] / Liebe [اسم],
-
-vielen Dank für [الهدية/المساعدة/الدعوة/...].
-
-[اكتب شيئاً محدداً عن الشيء الذي تشكر عليه]
-
-Das war sehr nett von dir. Ich habe mich sehr gefreut!
-
-[جملة إضافية إذا أردت]
-
-Nochmals vielen Dank!
-
-Liebe Grüße / Herzliche Grüße
-[اسمك]</div>
-                
-                <div class="example">
-                    <div class="example-title">✏️ مثال: شكر على هدية (56 كلمة)</div>
-                    <div class="example-content">Liebe Sara,
-
-vielen herzlichen Dank für das wunderschöne Geburtstagsgeschenk!
-
-Das interessante Buch gefällt mir sehr gut und ich lese es jeden Abend vor dem Schlafen. Du kennst meinen Geschmack wirklich sehr gut! Die tolle Party war auch super und ich habe mich riesig gefreut.
-
-Das war sehr nett und lieb von dir.
-
-Nochmals tausend Dank!
-
-Herzliche Grüße
-Fatima</div>
-                </div>
-            </div>
-            
-            <!-- القالب 7 -->
-            <div class="template-card">
-                <div class="template-title">
-                    <span class="template-number">7</span>
-                    وصف تجربة/حدث
-                </div>
-                <span class="importance">⭐⭐⭐⭐⭐ مهم جداً</span>
-                
-                <div class="template-usage">
-                    <strong>متى يُستخدم:</strong> وصف رحلة قمت بها، وصف يومك في العمل، وصف حفلة حضرتها
-                </div>
-                
-                <div class="german-template">Lieber [اسم] / Liebe [اسم],
-
-wie geht es dir? Danke für deine letzte E-Mail.
-
-[مقدمة قصيرة عن الموضوع]
-
-Am [يوم/تاريخ] war ich [مكان] / habe ich [نشاط] gemacht.
-
-Zuerst [نشاط 1]. Dann [نشاط 2]. Danach [نشاط 3].
-
-Es war sehr [صفة: schön/toll/interessant/langweilig...].
-Ich habe mich [sehr gefreut / nicht gefreut / gelangweilt].
-
-[سؤال للصديق أو جملة ختامية]
-
-Schreib mir bald!
-
-Viele Grüße
-[اسمك]</div>
-                
-                <div class="example">
-                    <div class="example-title">✏️ مثال: وصف رحلة (59 كلمة)</div>
-                    <div class="example-content">Liebe Maya,
-
-wie geht es dir? Danke für deine letzte nette E-Mail.
-
-Letztes Wochenende war ich mit meiner ganzen Familie am schönen Meer.
-
-Am Samstag sind wir früh um 8 Uhr losgefahren. Zuerst haben wir im Hotel eingecheckt. Dann sind wir zum Strand gegangen und haben im Meer geschwommen. Danach haben wir in einem tollen Restaurant lecker gegessen.
-
-Das Wetter war super - sehr sonnig und angenehm warm! Es war sehr schön.
-
-Warst du auch im Urlaub?
-
-Schreib mir bald!
-
-Viele Grüße
-Fatima</div>
-                </div>
-            </div>
-            
-            <!-- القالب 8 -->
-            <div class="template-card">
-                <div class="template-title">
-                    <span class="template-number">8</span>
-                    اقتراح/خطة
-                </div>
-                <span class="importance">⭐⭐⭐⭐ مهم</span>
-                
-                <div class="template-usage">
-                    <strong>متى يُستخدم:</strong> اقتراح نشاط مع صديق، التخطيط للقاء، اقتراح حل لمشكلة
-                </div>
-                
-                <div class="german-template">Lieber [اسم] / Liebe [اسم],
-
-wie geht es dir? Lange nicht gehört!
-
-Ich habe eine Idee: Wir können [نشاط] machen.
-
-Wann hast du Zeit? Ich habe am [يوم] Zeit.
-Wir können [مكان] treffen und [نشاط 1], [نشاط 2].
-
-Was meinst du? / Was denkst du? / Hast du Lust?
-
-Sag mir Bescheid!
+Hast du Zeit und Lust, uns nächsten Sonntag zu besuchen?
 
 Liebe Grüße
-[اسمك]</div>
+Ahmet</div>
                 
-                <div class="example">
-                    <div class="example-title">✏️ مثال: اقتراح الذهاب للسينما (58 كلمة)</div>
-                    <div class="example-content">Liebe Sara,
+                <div class="aufgabe">
+                    <h3>✍️ Ihre Aufgabe:</h3>
+                    <p><strong>Schreiben Sie ein E-Mail an Ahmet.</strong></p>
+                    <p><strong>Schreiben Sie circa 50 Wörter.</strong></p>
+                    <p><strong>Beantworten Sie alle Fragen:</strong></p>
+                    <ul class="punkteliste">
+                        <li>Wie geht es dir?</li>
+                        <li>Was machst du eigentlich? Arbeitest du?</li>
+                        <li>Was machst du in deiner Freizeit?</li>
+                        <li>Hast du Zeit, uns zu besuchen?</li>
+                    </ul>
+                </div>
+                
+                <div class="answer-section">
+                    <div class="answer-title">✅ الإجابة النموذجية 1</div>
+                    <div class="answer-content">
+                        <div class="answer-text">Lieber Ahmet,
 
-wie geht es dir? Lange nicht mehr gesehen!
+vielen Dank für deine E-Mail! Mir geht es gut, danke. Ich hoffe, dir geht es auch gut.
 
-Ich habe eine tolle Idee: Wir können zusammen ins Kino gehen.
+Ich arbeite zurzeit als Lehrer, um Schüler zu unterrichten, und bereite jeden Tag die Aufgaben vor.
 
-Am Samstag läuft ein spannender neuer Film im City-Kino. Der Film heißt "Avatar 3" und beginnt um 20 Uhr abends. Wir können uns um 19:30 Uhr direkt vor dem Kino treffen und vorher noch etwas trinken.
+Am Wochenende spiele ich immer Fußball mit meinem Freund. Sport ist sehr wichtig für mich, weil er mir hilft, gesund und fit zu bleiben und Stress abzubauen.
 
-Hast du Zeit am Samstag? Hast du Lust mitzukommen?
-
-Sag mir bitte schnell Bescheid!
+Ja, ich habe am Sonntag Zeit und Lust, euch zu besuchen! Ich freue mich sehr darauf!
 
 Liebe Grüße
+Ahmed</div>
+                        <span class="word-count">📊 عدد الكلمات: 76 كلمة</span>
+                    </div>
+                </div>
+                
+                <div class="answer-section">
+                    <div class="answer-title">✅ الإجابة النموذجية 2</div>
+                    <div class="answer-content">
+                        <div class="answer-text">Lieber Ahmet,
+
+vielen Dank für deine Nachricht! Ich freue mich, dass du Arbeit gefunden hast!
+
+Mir geht es sehr gut. Ich studiere zurzeit Informatik an der Universität und habe viele Prüfungen.
+
+In meiner Freizeit lese ich gern Bücher und treffe mich mit Freunden. Manchmal gehe ich auch ins Kino oder spazieren.
+
+Ja, ich komme gerne am Sonntag! Um wie viel Uhr soll ich kommen?
+
+Bis bald!
+Liebe Grüße
+Sara</div>
+                        <span class="word-count">📊 عدد الكلمات: 68 كلمة</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-break"></div>
+            
+            <!-- السؤال 2 -->
+            <div class="question-block">
+                <div class="question-title">
+                    <span class="question-number">2</span>
+                    رسالة Emma عن برلين
+                </div>
+                
+                <div class="source">
+                    📎 المصدر: ÖSD Zertifikat A2 / Jugendliche - Modellprüfung
+                </div>
+                
+                <div class="situation">
+                    <strong>Situation:</strong><br>
+                    Deine Freundin Emma schreibt dir:
+                </div>
+                
+                <div class="email-box">Hallo!
+
+Ich fahre nächste Woche nach Berlin! Ich bleibe 5 Tage dort. Ich möchte so viel wie möglich sehen!
+
+Warst du schon in Berlin? Was kann ich dort machen? Hast du Tipps für mich?
+
+Liebe Grüße
+Emma</div>
+                
+                <div class="aufgabe">
+                    <h3>✍️ Deine Aufgabe:</h3>
+                    <p><strong>Schreibe eine Antwort an Emma.</strong></p>
+                    <p><strong>Schreibe circa 50 Wörter zu folgenden Punkten:</strong></p>
+                    <ul class="punkteliste">
+                        <li>Warst du schon in Berlin? (Ja/Nein)</li>
+                        <li>Was kann Emma in Berlin machen? (2-3 Vorschläge)</li>
+                        <li>Gib ihr einen Tipp</li>
+                    </ul>
+                </div>
+                
+                <div class="answer-section">
+                    <div class="answer-title">✅ الإجابة النموذجية 1 (إذا كنت في برلين)</div>
+                    <div class="answer-content">
+                        <div class="answer-text">Liebe Emma,
+
+wie geht es dir? Ich freue mich sehr, dass du nach Berlin fährst!
+
+Ja, ich war schon in Berlin. Die Stadt ist wirklich toll!
+
+Du solltest unbedingt das Brandenburger Tor besuchen. Danach kannst du im Tiergarten spazieren gehen. Am Abend empfehle ich dir, am Alexanderplatz zu essen. Probiere auch Currywurst - das ist typisch für Berlin!
+
+Mein Tipp: Kauf dir eine Tageskarte für die U-Bahn. So kannst du überall günstig hinfahren.
+
+Viel Spaß und eine schöne Reise!
+
+Liebe Grüße
+Ali</div>
+                        <span class="word-count">📊 عدد الكلمات: 85 كلمة</span>
+                    </div>
+                </div>
+                
+                <div class="answer-section">
+                    <div class="answer-title">✅ الإجابة النموذجية 2 (إذا لم تكن في برلين)</div>
+                    <div class="answer-content">
+                        <div class="answer-text">Liebe Emma,
+
+wie geht es dir? Super, dass du nach Berlin fährst!
+
+Nein, ich war noch nicht in Berlin, aber ich habe viel Gutes gehört!
+
+Du solltest die bekannten Sehenswürdigkeiten besuchen und durch die Stadt spazieren. Es gibt auch viele schöne Parks und Museen. Probiere unbedingt lokales Essen - das ist immer spannend!
+
+Mein Tipp: Nimm bequeme Schuhe mit, weil du viel laufen wirst. Und mach viele Fotos!
+
+Viel Spaß und erzähl mir dann alles!
+
+Liebe Grüße
+Fatima</div>
+                        <span class="word-count">📊 عدد الكلمات: 78 كلمة</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="page-break"></div>
+            
+            <!-- السؤال 3 -->
+            <div class="question-block">
+                <div class="question-title">
+                    <span class="question-number">3</span>
+                    اعتذار لـ Sabine
+                </div>
+                
+                <div class="source">
+                    📎 المصدر: ÖSD A2 Grundstufe Deutsch - Modellsatz
+                </div>
+                
+                <div class="situation">
+                    <strong>Situation:</strong><br>
+                    Sie können nicht zur Geburtstagsparty von Ihrer Freundin Sabine kommen.
+                </div>
+                
+                <div class="email-box">Sie haben diese Einladung bekommen:
+
+Liebe/r ...,
+
+am Samstag, 20. Mai, habe ich Geburtstag!
+Ich mache eine Party ab 19 Uhr bei mir zu Hause.
+
+Kommst du?
+
+Liebe Grüße
+Sabine</div>
+                
+                <div class="aufgabe">
+                    <h3>✍️ Ihre Aufgabe:</h3>
+                    <p><strong>Schreiben Sie eine Antwort an Sabine.</strong></p>
+                    <p><strong>Schreiben Sie circa 50 Wörter zu folgenden Punkten:</strong></p>
+                    <ul class="punkteliste">
+                        <li>Dank für die Einladung</li>
+                        <li>Sie können nicht kommen (Grund)</li>
+                        <li>Vorschlag: Wann können Sie sich treffen?</li>
+                        <li>Gute Wünsche zum Geburtstag</li>
+                    </ul>
+                </div>
+                
+                <div class="answer-section">
+                    <div class="answer-title">✅ الإجابة النموذجية 1</div>
+                    <div class="answer-content">
+                        <div class="answer-text">Liebe Sabine,
+
+vielen Dank für deine Einladung! Ich freue mich sehr darüber.
+
+Leider habe ich am Samstag keine Zeit, deshalb kann ich leider nicht kommen. Ich muss an diesem Tag arbeiten. Es tut mir wirklich sehr leid!
+
+Vielleicht können wir uns nächste Woche treffen? Ich habe am Freitagnachmittag Zeit. Wir können uns im Park treffen oder einen Kaffee trinken gehen.
+
+Alles Gute zum Geburtstag! Ich hoffe, du hast eine tolle Party!
+
+Liebe Grüße
+Ahmed</div>
+                        <span class="word-count">📊 عدد الكلمات: 72 كلمة</span>
+                    </div>
+                </div>
+                
+                <div class="answer-section">
+                    <div class="answer-title">✅ الإجابة النموذجية 2</div>
+                    <div class="answer-content">
+                        <div class="answer-text">Liebe Sabine,
+
+herzlichen Dank für deine Einladung zur Party!
+
+Leider kann ich am Samstag nicht kommen, weil meine Familie mich an diesem Wochenende besucht. Das tut mir so leid!
+
+Können wir uns vielleicht am Sonntag treffen? Ich möchte dir dein Geschenk geben und mit dir feiern. Hast du am Nachmittag Zeit?
+
+Ich wünsche dir alles Gute zum Geburtstag und viel Spaß bei der Party!
+
+Bis bald!
+Viele Grüße
 Layla</div>
-                </div></div>
+                        <span class="word-count">📊 عدد الكلمات: 69 كلمة</span>
+                    </div>
+                </div>
             </div>
             
-            <button class="print-btn" onclick="window.print()">🖨️ طباعة الصفحة</button>
+            <div class="page-break"></div>
             
-            <div style="background: #e8f5e9; padding: 20px; border-radius: 10px; margin-top: 30px; text-align: center;">
-                <h3 style="color: #2e7d32; margin-bottom: 10px;">✅ نصائح مهمة للامتحان</h3>
-                <p style="color: #1b5e20; line-height: 1.8;">
-                    • اقرأ السؤال جيداً - عادةً يعطونك 3-4 نقاط محددة<br>
-                    • استخدم القالب المناسب مباشرة<br>
-                    • لا تكتب كثيراً - 60-80 كلمة كافية!<br>
-                    • راجع الأخطاء البسيطة (النهايات، الأفعال)<br>
-                    • اكتب بخط واضح
-                </p>
+            <!-- السؤال 4 -->
+            <div class="question-block">
+                <div class="question-title">
+                    <span class="question-number">4</span>
+                    رسالة Paul (أخبار عنك)
+                </div>
+                
+                <div class="source">
+                    📎 المصدر: ÖSD A2 Österreich - Übungsmaterialien
+                </div>
+                
+                <div class="situation">
+                    <strong>Situation:</strong><br>
+                    Ihr Freund Paul schreibt Ihnen:
+                </div>
+                
+                <div class="email-box">Hallo!
+
+Wie geht's? Ich habe lange nichts von dir gehört!
+
+Was machst du gerade? Arbeitest du? Studierst du? Und was machst du in deiner Freizeit?
+
+Wollen wir uns bald treffen?
+
+Liebe Grüße
+Paul</div>
+                
+                <div class="aufgabe">
+                    <h3>✍️ Ihre Aufgabe:</h3>
+                    <p><strong>Schreiben Sie eine Antwort an Paul.</strong></p>
+                    <p><strong>Schreiben Sie circa 50 Wörter und beantworten Sie alle Fragen:</strong></p>
+                    <ul class="punkteliste">
+                        <li>Wie geht es Ihnen?</li>
+                        <li>Was machen Sie? (Arbeit/Studium)</li>
+                        <li>Was machen Sie in der Freizeit?</li>
+                        <li>Ja/Nein zum Treffen (+ Vorschlag wann)</li>
+                    </ul>
+                </div>
+                
+                <div class="answer-section">
+                    <div class="answer-title">✅ الإجابة النموذجية 1</div>
+                    <div class="answer-content">
+                        <div class="answer-text">Lieber Paul,
+
+vielen Dank für deine E-Mail! Mir geht es gut, danke. Ich hoffe, dir geht es auch gut.
+
+Ich arbeite zurzeit als Lehrer, um Schüler zu unterrichten, und bereite jeden Tag die Aufgaben vor.
+
+Am Wochenende spiele ich immer Fußball mit meinem Freund. Sport ist sehr wichtig für mich, weil er mir hilft, gesund und fit zu bleiben und Stress abzubauen.
+
+Ja, ich habe Zeit und Lust, dich zu treffen! Ich schlage vor: Wir treffen uns am Samstag. Passt dir das?
+
+Ich freue mich darauf!
+
+Liebe Grüße
+Ahmed</div>
+                        <span class="word-count">📊 عدد الكلمات: 88 كلمة</span>
+                    </div>
+                </div>
+                
+                <div class="answer-section">
+                    <div class="answer-title">✅ الإجابة النموذجية 2</div>
+                    <div class="answer-content">
+                        <div class="answer-text">Lieber Paul,
+
+schön, wieder von dir zu hören! Mir geht es super, danke!
+
+Ich studiere noch Medizin. Zurzeit habe ich viele Prüfungen und lerne viel. Es ist stressig, aber es macht Spaß.
+
+In meiner Freizeit gehe ich oft joggen oder treffe mich mit Freunden im Café. Am Wochenende besuche ich manchmal meine Familie.
+
+Ja, sehr gerne! Ich habe nächsten Freitag frei. Wollen wir zusammen essen gehen?
+
+Schreib mir!
+
+Viele Grüße
+Omar</div>
+                        <span class="word-count">📊 عدد الكلمات: 71 كلمة</span>
+                    </div>
+                </div>
             </div>
+            
+            <div class="page-break"></div>
+            
+            <!-- السؤال 5 -->
+            <div class="question-block">
+                <div class="question-title">
+                    <span class="question-number">5</span>
+                    المدرسة الجديدة
+                </div>
+                
+                <div class="source">
+                    📎 المصدر: ÖSD A2 Jugendliche - Übungstest
+                </div>
+                
+                <div class="situation">
+                    <strong>Situation:</strong><br>
+                    Du bist seit 2 Wochen in einer neuen Schule. Du schreibst an deinen alten Freund Tom.
+                </div>
+                
+                <div class="aufgabe">
+                    <h3>✍️ Deine Aufgabe:</h3>
+                    <p><strong>Schreibe eine E-Mail an Tom.</strong></p>
+                    <p><strong>Schreibe circa 50 Wörter über folgende Punkte:</strong></p>
+                    <ul class="punkteliste">
+                        <li>Wie geht es dir in der neuen Schule?</li>
+                        <li>Wie sind die Lehrer?</li>
+                        <li>Hast du neue Freunde?</li>
+                        <li>Lädst du Tom ein, dich zu besuchen?</li>
+                    </ul>
+                </div>
+                
+                <div class="answer-section">
+                    <div class="answer-title">✅ الإجابة النموذجية 1</div>
+                    <div class="answer-content">
+                        <div class="answer-text">Lieber Tom,
+
+wie geht es dir? Ich hoffe, bei dir ist alles gut!
+
+Mir geht es super in der neuen Schule! Am Anfang war ich etwas nervös, aber jetzt fühle ich mich schon viel besser.
+
+Die Lehrer sind sehr nett und hilfsbereit. Sie erklären alles gut und haben immer Zeit für Fragen.
+
+Ja, ich habe schon neue Freunde gefunden! Wir essen zusammen in der Pause und machen manchmal nach der Schule Sport.
+
+Hast du Lust, mich zu besuchen? Du kannst am Wochenende kommen und ich zeige dir die neue Schule und die Stadt!
+
+Schreib mir bald!
+
+Liebe Grüße
+Karim</div>
+                        <span class="word-count">📊 عدد الكلمات: 95 كلمة</span>
+                    </div>
+                </div>
+                
+                <div class="answer-section">
+                    <div class="answer-title">✅ الإجابة النموذجية 2</div>
+                    <div class="answer-content">
+                        <div class="answer-text">Lieber Tom,
+
+danke für deine Nachricht! Mir fehlt ihr alle sehr!
+
+In der neuen Schule geht es mir gut. Es ist noch etwas komisch, aber ich gewöhne mich langsam daran.
+
+Die Lehrer sind okay. Manche sind streng, aber fair. Der Mathelehrer ist besonders nett.
+
+Ich habe zwei neue Freunde: Max und Lisa. Sie sind sehr freundlich und helfen mir viel.
+
+Kommst du mich bald besuchen? Es wäre toll, dich wiederzusehen! Vielleicht in den Ferien?
+
+Melde dich!
+
+Viele Grüße
+Yasmin</div>
+                        <span class="word-count">📊 عدد الكلمات: 77 كلمة</span>
+                    </div>
+                </div>
+            </div>
+            
         </div>
     </div>
 </body>
